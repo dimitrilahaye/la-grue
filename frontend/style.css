@@ -97,7 +97,8 @@ a { color: var(--color-accent-dark); }
 .day-nav {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
   position: sticky;
   top: var(--header-height);
   z-index: 5;
@@ -105,6 +106,40 @@ a { color: var(--color-accent-dark); }
   padding: var(--space-sm) 0;
   margin-bottom: var(--space-md);
 }
+.day-nav-tools {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.day-today-btn {
+  height: 28px;
+  padding: 0 var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition);
+}
+.day-today-btn:hover { background: var(--color-accent); border-color: var(--color-accent); color: #1A1A1A; }
+.day-today-btn.is-today { background: var(--color-accent); border-color: var(--color-accent); color: #1A1A1A; }
+.day-date-input {
+  height: 28px;
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.78rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+.day-date-input:focus { outline: none; border-color: var(--color-accent); }
 .day-btn {
   min-width: 44px;
   min-height: 44px;

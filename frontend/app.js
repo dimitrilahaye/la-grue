@@ -105,6 +105,13 @@ async function fetchEventById(id) {
   return res.json();
 }
 
+async function fetchCities() {
+  const res = await fetch('/api/cities');
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.data ?? [];
+}
+
 // === Rendering =============================================================
 function renderCard(event) {
   const article = document.createElement('article');
@@ -176,8 +183,15 @@ function updateLoadMore() {
   wrap.hidden = state.offset + state.limit >= state.total;
 }
 
+function syncDatePicker() {
+  const picker = document.getElementById('date-picker');
+  picker.value = state.currentDate;
+  document.getElementById('today-btn').classList.toggle('is-today', isToday(state.currentDate));
+}
+
 function updateDayLabel() {
   document.getElementById('day-label').textContent = dayLabel(state.currentDate);
+  syncDatePicker();
 }
 
 // === Load events ===========================================================
@@ -337,9 +351,24 @@ function clearIframe() {
   iframeEl.onload = null;
 }
 
+// === City select ===========================================================
+async function initCitySelect() {
+  const select = document.getElementById('city-select');
+  try {
+    const cities = await fetchCities();
+    for (const city of cities) {
+      const opt = document.createElement('option');
+      opt.value = city;
+      opt.textContent = city;
+      select.appendChild(opt);
+    }
+  } catch (_) {}
+}
+
 // === Event listeners =======================================================
 function init() {
   updateDayLabel();
+  initCitySelect();
 
   // Day navigation
   document.getElementById('prev-day').addEventListener('click', () => {
@@ -356,11 +385,27 @@ function init() {
     loadEvents();
   });
 
+  document.getElementById('today-btn').addEventListener('click', () => {
+    state.currentDate = todayDateStr();
+    state.offset = 0;
+    updateDayLabel();
+    loadEvents();
+  });
+
+  document.getElementById('date-picker').addEventListener('change', (e) => {
+    if (e.target.value) {
+      state.currentDate = e.target.value;
+      state.offset = 0;
+      updateDayLabel();
+      loadEvents();
+    }
+  });
+
   // Search form
   document.getElementById('search-form').addEventListener('submit', (e) => {
     e.preventDefault();
     state.currentCategory = document.getElementById('category-select').value;
-    state.currentCity = document.getElementById('city-input').value.trim();
+    state.currentCity = document.getElementById('city-select').value;
     state.offset = 0;
     loadEvents();
   });
@@ -370,7 +415,7 @@ function init() {
     state.currentCity = '';
     state.offset = 0;
     document.getElementById('category-select').value = '';
-    document.getElementById('city-input').value = '';
+    document.getElementById('city-select').value = '';
     loadEvents();
   });
 

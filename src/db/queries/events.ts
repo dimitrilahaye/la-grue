@@ -1,4 +1,4 @@
-import { and, eq, gte, lt, ilike, count } from 'drizzle-orm';
+import { and, eq, gte, lt, ilike, count, isNotNull, asc } from 'drizzle-orm';
 import { db } from '../client';
 import { events, type Event } from '../schema';
 
@@ -75,4 +75,13 @@ export async function findEvents(filters: EventFilters): Promise<{
 export async function findEventById(id: string): Promise<Event | null> {
   const rows = await db.select().from(events).where(eq(events.id, id)).limit(1);
   return rows[0] ?? null;
+}
+
+export async function findCities(): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ city: events.city })
+    .from(events)
+    .where(isNotNull(events.city))
+    .orderBy(asc(events.city));
+  return rows.map((r) => r.city as string);
 }

@@ -44,6 +44,10 @@
       <button class="day-btn" id="prev-day" aria-label="Jour précédent">&#8592;</button>
       <div class="day-label" id="day-label" aria-live="polite">Aujourd'hui</div>
       <button class="day-btn" id="next-day" aria-label="Jour suivant">&#8594;</button>
+      <div class="day-nav-tools">
+        <button class="day-today-btn" id="today-btn">Aujourd'hui</button>
+        <input type="date" id="date-picker" class="day-date-input" aria-label="Choisir une date" />
+      </div>
     </nav>
 
     <!-- Formulaire de recherche -->
@@ -63,8 +67,10 @@
           </select>
         </div>
         <div class="field-group">
-          <label for="city-input" class="field-label">Ville</label>
-          <input type="text" id="city-input" name="city" class="field-input" placeholder="Nantes" autocomplete="off" />
+          <label for="city-select" class="field-label">Ville</label>
+          <select id="city-select" name="city" class="field-input">
+            <option value="">Toutes les villes</option>
+          </select>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Chercher</button>
