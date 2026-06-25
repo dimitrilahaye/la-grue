@@ -143,6 +143,8 @@ Le job tourne chaque nuit à 3h et persiste les événements de la semaine en co
 
 ### Sources prévues (v2)
 
-| Source | Type | Pourquoi reporté |
+| Source | Type | Notes |
 |---|---|---|
+| [Grabuge Mag](https://www.grabugemag.com) | API WordPress REST (`/wp-json/tribe/events/v1/events`) | Filtrable par date et catégorie, ~430 événements, JSON structuré avec lieu + coordonnées |
+| [Pull Rouge](https://pullrouge.fr) | Scraping HTML statique | Page unique, pas de robots.txt, dates et lieux en texte brut à parser par regex |
 | [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping HTML | Site rendu côté client (JS) — nécessite Playwright ou Puppeteer, non justifié en v1 |
