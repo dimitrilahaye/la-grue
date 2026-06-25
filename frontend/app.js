@@ -352,6 +352,16 @@ function loadIframe(url) {
   iframeEl.onload = () => {
     loaded = true;
     clearTimeout(timeout);
+    try {
+      const body = iframeEl.contentDocument?.body;
+      if (!body || body.innerHTML.trim() === '') {
+        overlay.classList.add('hidden');
+        fallback.hidden = false;
+        return;
+      }
+    } catch (_) {
+      // Cross-origin SecurityError → real page loaded successfully
+    }
     overlay.classList.add('hidden');
     fallback.hidden = true;
   };
