@@ -75,7 +75,7 @@
     <div class="detail-panel">
       <button class="detail-close" id="detail-close" aria-label="Fermer la fiche">&#10005;</button>
 
-      <div class="detail-image-wrap" id="detail-image-wrap">
+      <div class="detail-image-wrap" id="detail-image-wrap" hidden>
         <img id="detail-image" src="" alt="" class="detail-image" />
       </div>
 
@@ -98,7 +98,7 @@
               <p>Ce site ne peut pas être affiché ici.</p>
               <a id="iframe-fallback-link" href="#" target="_blank" rel="noopener noreferrer">Ouvrir dans un nouvel onglet &#8599;</a>
             </div>
-            <iframe id="detail-iframe" class="detail-iframe" title="Aperçu de la page source" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+            <iframe id="detail-iframe" class="detail-iframe" title="Aperçu de la page source" sandbox="allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
           </div>
           <button class="btn btn-ghost btn-sm" id="close-iframe-btn">Fermer l'aperçu</button>
         </div>
@@ -107,10 +107,6 @@
   </div>
 
   <script src="/app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    }
-  </script>
+  <script src="/sw-register.js"></script>
 </body>
 </html>

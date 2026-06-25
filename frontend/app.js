@@ -144,17 +144,25 @@ function renderCard(event) {
   return article;
 }
 
+function clearCards(list) {
+  const loadingEl = document.getElementById('loading-state');
+  [...list.children].forEach(c => { if (c !== loadingEl) c.remove(); });
+}
+
 function renderList(events, append = false) {
   const list = document.getElementById('events-list');
 
   document.getElementById('loading-state').hidden = true;
 
   if (!append) {
-    list.innerHTML = '';
+    clearCards(list);
   }
 
   if (events.length === 0 && !append) {
-    list.innerHTML = `<div class="empty-state">Aucun événement trouvé pour ces critères.</div>`;
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Aucun événement trouvé pour ces critères.';
+    list.appendChild(empty);
     return;
   }
 
@@ -178,9 +186,9 @@ async function loadEvents(append = false) {
   state.loading = true;
 
   if (!append) {
+    const list = document.getElementById('events-list');
     document.getElementById('loading-state').hidden = false;
-    document.getElementById('events-list').innerHTML = '';
-    document.getElementById('events-list').appendChild(document.getElementById('loading-state'));
+    clearCards(list);
   }
 
   try {
@@ -196,8 +204,13 @@ async function loadEvents(append = false) {
     renderList(result.data, append);
     updateLoadMore();
   } catch (_err) {
-    document.getElementById('events-list').innerHTML =
-      `<div class="error-state">Impossible de charger les événements. Réessaie dans un moment.</div>`;
+    const list = document.getElementById('events-list');
+    document.getElementById('loading-state').hidden = true;
+    clearCards(list);
+    const errEl = document.createElement('div');
+    errEl.className = 'error-state';
+    errEl.textContent = 'Impossible de charger les événements. Réessaie dans un moment.';
+    list.appendChild(errEl);
     document.getElementById('load-more-wrap').hidden = true;
   } finally {
     state.loading = false;
@@ -249,7 +262,7 @@ function openDetail(id) {
     // Price
     const priceEl = document.getElementById('detail-price');
     if (event.priceInfo) {
-      priceEl.textContent = `&#127973; ${event.priceInfo}`;
+      priceEl.innerHTML = `&#127915; ${escapeHtml(event.priceInfo)}`;
       priceEl.hidden = false;
     } else {
       priceEl.hidden = true;
