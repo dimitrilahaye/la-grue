@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Fond -->
+  <rect width="200" height="200" fill="#FFFFFF" rx="20"/>
+
+  <!-- Mât vertical de la grue -->
+  <rect x="88" y="30" width="12" height="130" fill="#4A4A4A" rx="3"/>
+
+  <!-- Bras horizontal de la grue (jaune) -->
+  <rect x="30" y="30" width="130" height="12" fill="#F5C518" rx="3"/>
+
+  <!-- Contrepoids (gris, côté gauche) -->
+  <rect x="30" y="42" width="30" height="18" fill="#4A4A4A" rx="3"/>
+
+  <!-- Câble vertical depuis le bras -->
+  <line x1="140" y1="42" x2="140" y2="100" stroke="#4A4A4A" stroke-width="3"/>
+
+  <!-- Câble diagonal depuis la pointe du bras vers le mât -->
+  <line x1="156" y1="36" x2="94" y2="36" stroke="#4A4A4A" stroke-width="2"/>
+
+  <!-- Crochet de la grue -->
+  <path d="M136 100 Q136 114 143 114 Q150 114 150 108 Q150 102 143 102" fill="none" stroke="#F5C518" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Base de la grue (trépied) -->
+  <polygon points="88,160 60,185 116,185" fill="#4A4A4A"/>
+
+  <!-- Petite grue grise (la deuxième, à droite) -->
+  <rect x="152" y="80" width="6" height="70" fill="#9B9B9B" rx="2"/>
+  <rect x="140" y="80" width="50" height="6" fill="#9B9B9B" rx="2"/>
+  <line x1="178" y1="86" x2="178" y2="126" stroke="#9B9B9B" stroke-width="2"/>
+  <path d="M175 126 Q175 134 179 134 Q183 134 183 130 Q183 126 179 126" fill="none" stroke="#9B9B9B" stroke-width="2.5" stroke-linecap="round"/>
+  <polygon points="152,150 142,163 162,163" fill="#9B9B9B"/>
+</svg>
