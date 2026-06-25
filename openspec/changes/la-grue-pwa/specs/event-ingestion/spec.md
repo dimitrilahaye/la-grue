@@ -30,24 +30,26 @@ Le système SHALL interroger l'API OpenAgenda Pays de la Loire (`https://data.pa
 
 ---
 
-### Requirement: Scraping WIK Nantes — deux passes
-Le système SHALL scraper `https://www.wik-nantes.fr/agenda` en deux passes : (1) extraction de la liste des événements avec leur URL de détail, (2) scraping séquentiel de chaque page détail avec un délai d'au moins 1500ms entre chaque requête pour respecter le serveur source.
+### Requirement: Scraping WIK Nantes — passe unique sur le listing
+Le système SHALL scraper `https://www.wik-nantes.fr/agenda?date=DD/MM/YYYY` (date du jour encodée en URL) en une seule passe sur la page listing. Toutes les données utiles (titre, date, lieu, image, catégorie déduite du path URL) sont extraites directement depuis les cards de la liste sans passer par les pages détail.
 
-#### Scenario: Passe 1 — extraction de la liste
-- **WHEN** le job charge la page listing WIK
-- **THEN** tous les liens vers des pages détail sont extraits ainsi que le titre et la catégorie déduite du path URL
+> **Note d'implémentation** : l'approche deux passes (listing + pages détail) prévue initialement a été abandonnée car les pages détail WIK ne contenaient pas les données structurées attendues (date, lieu). L'URL sans paramètre `?date=` retourne une page vide. La passe unique sur le listing avec le paramètre de date est plus fiable.
 
-#### Scenario: Passe 2 — scraping des pages détail
-- **WHEN** le job scrape une page détail WIK
-- **THEN** lieu, date/heure de début et fin, description et image sont extraits et fusionnés avec les données de la passe 1
+#### Scenario: Extraction depuis la page listing
+- **WHEN** le job charge la page listing WIK avec le paramètre `?date=DD/MM/YYYY`
+- **THEN** titre, date/heure (format "DD mois YYYY, HHhMM"), lieu, image et catégorie (déduite du path URL `/nantes/N/<category>/slug`) sont extraits depuis chaque card
 
-#### Scenario: Rate limiting respecté
-- **WHEN** le job traite plusieurs pages détail en séquence
-- **THEN** un délai d'au moins 1500ms est respecté entre chaque requête HTTP vers WIK
+#### Scenario: Date de fin optionnelle
+- **WHEN** une card contient "Jusqu'au DD mois YYYY"
+- **THEN** la date de fin est extraite et stockée dans `end_at`
 
-#### Scenario: Page détail inaccessible
-- **WHEN** une page détail WIK retourne une erreur HTTP
-- **THEN** l'événement est ignoré pour ce run, une ligne de log est émise, le job continue avec le suivant
+#### Scenario: Pagination
+- **WHEN** la page listing contient des résultats
+- **THEN** le job enchaîne les pages suivantes (`?page=N&date=...`) jusqu'à obtenir une page vide ou atteindre MAX_PAGES
+
+#### Scenario: Page inaccessible
+- **WHEN** une page WIK retourne une erreur HTTP
+- **THEN** une ligne de log est émise et la pagination s'arrête proprement
 
 ---
 

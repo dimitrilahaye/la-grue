@@ -53,17 +53,19 @@ PgBouncer ne supporte pas les DDL en mode transaction → migrations toujours su
 
 ---
 
-### D3 — Scraping HTML avec Cheerio + rate limiting
+### D3 — Scraping HTML avec Cheerio, passe unique sur le listing WIK
 
-**Décision :** Cheerio pour WIK Nantes (HTML statique). Rate limiting avec `p-limit` (1 requête à la fois) + délai de 1-2s entre les pages détail pour ne pas surcharger le serveur source.
+**Décision :** Cheerio pour WIK Nantes (HTML statique). Passe unique sur la page listing avec le paramètre `?date=DD/MM/YYYY` — toutes les données utiles (titre, date, lieu, image, catégorie) sont disponibles directement dans les cards du listing.
 
 **Alternatives considérées :**
 - Playwright/Puppeteer → nécessaire uniquement pour JS-rendered (Big City, v2). Overhead de 150MB+ non justifié en v1.
 - Fetch parallèle sans rate limit → risque de ban IP, comportement non respectueux
+- Deux passes (listing + pages détail) → abandonnée : les pages détail WIK ne contiennent pas les données structurées attendues, et l'URL sans `?date=` retourne une page vide.
 
-**WIK — stratégie deux passes :**
-1. Passe 1 : scraper la page listing `/agenda` → liste de `{title, categoryFromUrl, detailUrl}`
-2. Passe 2 : pour chaque event, scraper la page détail → `{venue, startAt, endAt, description, imageUrl}`
+**WIK — stratégie effective (passe unique) :**
+1. Fetch `GET /agenda?date=DD/MM/YYYY` → parse les cards `.listing-articles--agenda .article`
+2. Extraire depuis chaque card : titre (`h2.h2`), date (`.date`, format "DD mois YYYY, HHhMM"), lieu (`.area`), image (`img`), catégorie (segment du path URL)
+3. Paginer avec `?page=N&date=...` jusqu'à page vide ou MAX_PAGES
 
 ---
 

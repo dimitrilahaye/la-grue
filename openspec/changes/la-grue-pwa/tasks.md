@@ -15,7 +15,7 @@
 - [x] 2.4 Configurer `drizzle.config.ts` avec deux profils (migration vs runtime) et le chemin `migrations/`
 - [x] 2.5 Exécuter `drizzle-kit generate` pour créer la première migration SQL
 - [x] 2.6 Ajouter le script `db:migrate` dans `package.json` (utilise `MIGRATION_DATABASE_URL`)
-- [ ] 2.7 Vérifier que `npm run db:migrate` applique correctement la migration sur la base Docker locale
+- [x] 2.7 Vérifier que `npm run db:migrate` applique correctement la migration sur la base Docker locale
 
 ## 3. Seed de données fictives
 
@@ -46,13 +46,13 @@
 - [x] 6.1 Créer `src/job/scrapers/wik.ts` — passe 1 : fetch + cheerio parsing de `/agenda` pour extraire `{title, categoryFromUrl, detailUrl}` pour chaque event
 - [x] 6.2 Implémenter la passe 2 dans le même scraper : fetch séquentiel de chaque page détail avec `p-limit(1)` et délai de 1500ms, extraction cheerio de `{venue, startAt, endAt, description, imageUrl}`
 - [x] 6.3 Implémenter `external_id` WIK = SHA-256 de `title + startAt.toISOString()`
-- [ ] 6.4 Écrire les tests Jest pour le scraper WIK (HTML fixtures, vérification du rate limiting)
+- [x] 6.4 Écrire les tests Jest pour le scraper WIK (HTML fixtures, vérification du rate limiting)
 
 ## 7. Job de scraping — Orchestrateur et déduplication
 
 - [x] 7.1 Créer `src/job/deduplicator.ts` avec `upsertEvents(events: NormalizedEvent[])` utilisant `INSERT ... ON CONFLICT (source, external_id) DO UPDATE SET ...`
 - [x] 7.2 Créer `src/job/index.ts` qui orchestre les 3 scrapers en parallèle (`Promise.allSettled`), normalise, déduplique, logue le résumé par source
-- [ ] 7.3 Écrire les tests Jest pour `upsertEvents` (insertion, mise à jour, pas de doublon)
+- [x] 7.3 Écrire les tests Jest pour `upsertEvents` (insertion, mise à jour, pas de doublon)
 
 ## 8. Endpoint interne cron trigger
 

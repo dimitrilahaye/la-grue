@@ -115,6 +115,17 @@ La PWA SHALL adopter un design minimaliste centré sur la lisibilité : fond cla
 
 ---
 
+### Extensions implémentées au-delà du scope initial
+
+Les fonctionnalités suivantes ont été ajoutées après la spec initiale :
+
+- **Bouton "Aujourd'hui"** dans la day-nav — retour direct à la date du jour, avec mise en évidence visuelle quand on est dessus
+- **Date picker natif** (`<input type="date">`) dans la day-nav — synchronisé bidirectionnellement avec la navigation ← →. Snap automatique vers la date la plus proche ayant des événements (via `GET /api/dates`)
+- **Dropdown ville dynamique** — le champ ville est un `<select>` peuplé depuis `GET /api/cities` (villes distinctes non-nulles de la BDD) à l'initialisation
+- **`GET /api/dates`** — endpoint retournant les dates distinctes (YYYY-MM-DD, timezone Europe/Paris) ayant au moins un événement, utilisé pour borner le date picker
+
+---
+
 ### Requirement: PWA installable
 La PWA SHALL inclure un `manifest.json` et un service worker enregistré pour satisfaire les critères d'installabilité du navigateur. Le manifest SHALL définir : `name: "La Grue"`, `short_name: "La Grue"`, `theme_color: "#F5C518"`, `background_color: "#FFFFFF"`, `display: "standalone"`, `start_url: "/"`, icônes 192×192 et 512×512.
 

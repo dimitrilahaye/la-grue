@@ -1,11 +1,13 @@
 ## ADDED Requirements
 
 ### Requirement: Docker Compose pour le développement local
-Le projet SHALL fournir un fichier `docker/docker-compose.yml` démarrant deux services : `postgres` (image officielle PostgreSQL 16, port 5432, variables `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` configurables via `.env`) et `adminer` (port 8080, pour inspecter la base graphiquement). Un volume nommé SHALL persister les données PostgreSQL entre les redémarrages.
+Le projet SHALL fournir un fichier `docker/docker-compose.yml` démarrant deux services : `postgres` (image officielle PostgreSQL 16, port host **5433** → container 5432, pour éviter les conflits avec une instance PostgreSQL locale) et `adminer` (port host **8082**, pour inspecter la base graphiquement). Un volume nommé SHALL persister les données PostgreSQL entre les redémarrages.
+
+> **Note** : les ports host ont été ajustés par rapport au design initial (5432→5433, 8080→8082) pour éviter les conflits avec des services locaux existants.
 
 #### Scenario: Démarrage de l'environnement local
-- **WHEN** `docker compose -f docker/docker-compose.yml up -d` est exécuté
-- **THEN** PostgreSQL et Adminer sont accessibles respectivement sur `localhost:5432` et `localhost:8080`
+- **WHEN** `docker compose -f docker/docker-compose.yml up -d --force-recreate` est exécuté
+- **THEN** PostgreSQL est accessible sur `localhost:5433` et Adminer sur `localhost:8082`
 
 #### Scenario: Persistance des données
 - **WHEN** Docker Compose est redémarré
