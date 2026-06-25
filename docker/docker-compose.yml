@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lagrue}
       POSTGRES_DB: ${POSTGRES_DB:-lagrue}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,7 +18,7 @@ services:
   adminer:
     image: adminer
     ports:
-      - "8081:8080"
+      - "8082:8080"
     depends_on:
       - postgres
 
