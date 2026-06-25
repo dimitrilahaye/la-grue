@@ -17,10 +17,17 @@ export async function upsertEvents(normalized: NormalizedEvent[]): Promise<Upser
   let updated = 0;
   let errors = 0;
 
+  // Deduplicate within the input: keep the last occurrence for each (source, external_id)
+  const seen = new Map<string, NormalizedEvent>();
+  for (const e of normalized) {
+    seen.set(`${e.source}:${e.externalId}`, e);
+  }
+  const deduped = [...seen.values()];
+
   // Process in batches of 50 to avoid oversized queries
   const BATCH_SIZE = 50;
-  for (let i = 0; i < normalized.length; i += BATCH_SIZE) {
-    const batch = normalized.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < deduped.length; i += BATCH_SIZE) {
+    const batch = deduped.slice(i, i + BATCH_SIZE);
 
     const rows = batch.map((e) => ({
       source: e.source,
