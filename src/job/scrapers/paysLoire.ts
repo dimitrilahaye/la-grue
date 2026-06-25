@@ -44,7 +44,7 @@ export async function scrapePaysLoire(): Promise<NormalizedEvent[]> {
 
   while (true) {
     const params = new URLSearchParams({
-      where: `firstdate_begin >= "${dateStart}" AND firstdate_begin <= "${dateEnd}" AND location_department = "44"`,
+      where: `firstdate_begin >= "${dateStart}" AND firstdate_begin <= "${dateEnd}" AND location_department = "Loire-Atlantique"`,
       limit: String(limit),
       offset: String(offset),
       order_by: 'firstdate_begin ASC',
@@ -102,6 +102,10 @@ export async function scrapePaysLoire(): Promise<NormalizedEvent[]> {
 
     offset += limit;
     if (offset >= total_count) break;
+  }
+
+  if (events.length === 0) {
+    console.warn('[PaysLoire] 0 events found — the dataset may be stale for Loire-Atlantique (last known data: 2025).');
   }
 
   return events;

@@ -25,6 +25,7 @@
 
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --transition: 200ms ease;
+  --header-height: 53px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -97,7 +98,12 @@ a { color: var(--color-accent-dark); }
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  position: sticky;
+  top: var(--header-height);
+  z-index: 5;
+  background: var(--color-bg);
+  padding: var(--space-sm) 0;
+  margin-bottom: var(--space-md);
 }
 .day-btn {
   min-width: 44px;

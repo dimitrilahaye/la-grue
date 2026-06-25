@@ -110,8 +110,19 @@ function parseArticle($: cheerio.CheerioAPI, el: AnyNode): NormalizedEvent | nul
   };
 }
 
-async function fetchPage(page: number): Promise<NormalizedEvent[]> {
-  const url = page === 0 ? AGENDA_URL : `${AGENDA_URL}?page=${page}`;
+function todayFr(): string {
+  const d = new Date();
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+async function fetchPage(page: number, dateParam: string): Promise<NormalizedEvent[]> {
+  const url =
+    page === 0
+      ? `${AGENDA_URL}?date=${encodeURIComponent(dateParam)}`
+      : `${AGENDA_URL}?page=${page}&date=${encodeURIComponent(dateParam)}`;
   const res = await axios.get<string>(url, {
     headers: { 'User-Agent': USER_AGENT },
     timeout: 15000,
@@ -130,10 +141,11 @@ async function fetchPage(page: number): Promise<NormalizedEvent[]> {
 
 export async function scrapeWik(): Promise<NormalizedEvent[]> {
   const allEvents: NormalizedEvent[] = [];
+  const dateParam = todayFr();
 
   for (let page = 0; page < MAX_PAGES; page++) {
     try {
-      const events = await fetchPage(page);
+      const events = await fetchPage(page, dateParam);
       if (events.length === 0) break;
       allEvents.push(...events);
       console.log(`[WIK] Page ${page}: ${events.length} events`);
