@@ -1,9 +1,16 @@
+import crypto from 'crypto';
 import { Router, Request, Response } from 'express';
 import { runJob } from '../../job';
 
 const router = Router();
 
 let jobRunning = false;
+
+function timingSafeCompare(a: string, b: string): boolean {
+  const hashA = crypto.createHash('sha256').update(a).digest();
+  const hashB = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(hashA, hashB);
+}
 
 router.post('/run-scrape', async (req: Request, res: Response) => {
   const secret = req.headers['x-cron-secret'];
@@ -15,7 +22,8 @@ router.post('/run-scrape', async (req: Request, res: Response) => {
     return;
   }
 
-  if (!secret || secret !== expectedSecret) {
+  const secretStr = Array.isArray(secret) ? secret[0] : secret;
+  if (!secretStr || !timingSafeCompare(secretStr, expectedSecret)) {
     console.warn('[Internal] Unauthorized attempt to trigger job');
     res.status(401).json({ error: 'Unauthorized' });
     return;

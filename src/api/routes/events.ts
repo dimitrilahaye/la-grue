@@ -1,7 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { findEvents, findEventById } from '../../db/queries/events';
+import { CATEGORIES } from '../../types/event';
 
 const router = Router();
+
+const MAX_LIMIT = 100;
+const MAX_CITY_LENGTH = 100;
 
 router.get('/events', async (req: Request, res: Response) => {
   const { date, category, city, limit: limitStr, offset: offsetStr } = req.query;
@@ -11,11 +15,25 @@ router.get('/events', async (req: Request, res: Response) => {
     return;
   }
 
+  if (category !== undefined) {
+    if (typeof category !== 'string' || !(CATEGORIES as readonly string[]).includes(category)) {
+      res.status(400).json({ error: `Invalid category. Must be one of: ${CATEGORIES.join(', ')}.` });
+      return;
+    }
+  }
+
+  if (city !== undefined) {
+    if (typeof city !== 'string' || city.trim().length === 0 || city.length > MAX_CITY_LENGTH) {
+      res.status(400).json({ error: `Invalid city. Must be a non-empty string of at most ${MAX_CITY_LENGTH} characters.` });
+      return;
+    }
+  }
+
   const limit = limitStr !== undefined ? parseInt(String(limitStr), 10) : undefined;
   const offset = offsetStr !== undefined ? parseInt(String(offsetStr), 10) : undefined;
 
-  if (limit !== undefined && (isNaN(limit) || limit < 1)) {
-    res.status(400).json({ error: 'Invalid limit. Must be a positive integer.' });
+  if (limit !== undefined && (isNaN(limit) || limit < 1 || limit > MAX_LIMIT)) {
+    res.status(400).json({ error: `Invalid limit. Must be between 1 and ${MAX_LIMIT}.` });
     return;
   }
   if (offset !== undefined && (isNaN(offset) || offset < 0)) {
@@ -27,7 +45,7 @@ router.get('/events', async (req: Request, res: Response) => {
     const result = await findEvents({
       date: typeof date === 'string' ? date : undefined,
       category: typeof category === 'string' ? category : undefined,
-      city: typeof city === 'string' ? city : undefined,
+      city: typeof city === 'string' ? city.trim() : undefined,
       limit,
       offset,
     });
