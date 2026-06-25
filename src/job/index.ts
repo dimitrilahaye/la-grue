@@ -2,7 +2,6 @@ import { scrapeNantesMetropole } from './scrapers/nantesMetropole';
 import { scrapePaysLoire } from './scrapers/paysLoire';
 import { scrapeWik } from './scrapers/wik';
 import { upsertEvents } from './deduplicator';
-import { type NormalizedEvent } from '../types/event';
 
 export interface JobSummary {
   source: string;
