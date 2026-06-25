@@ -25,7 +25,7 @@ docker compose -f docker/docker-compose.yml up -d
 ```
 
 - PostgreSQL accessible sur `localhost:5432`
-- Adminer accessible sur [http://localhost:8080](http://localhost:8080)
+- Adminer accessible sur [http://localhost:8081](http://localhost:8081)
   - Système : PostgreSQL
   - Serveur : `postgres`
   - Utilisateur / Mot de passe / Base : `lagrue`
