@@ -132,6 +132,10 @@ function renderCard(event) {
     ? `<div class="card-image"><img src="${escapeHtml(event.imageUrl)}" alt="" loading="lazy" /></div>`
     : `<div class="card-image-placeholder">${categoryIcon(event.category)}</div>`;
 
+  const categoryBadgeHtml = event.category !== 'autres'
+    ? `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`
+    : '';
+
   const freeHtml = event.isFree
     ? `<span class="badge badge-free">Gratuit</span>`
     : '';
@@ -142,7 +146,7 @@ function renderCard(event) {
     ${imageHtml}
     <div class="card-body">
       <div class="card-badges">
-        <span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>
+        ${categoryBadgeHtml}
         ${freeHtml}
       </div>
       <div class="card-title">${escapeHtml(event.title)}</div>
@@ -259,9 +263,11 @@ function openDetail(id) {
     }
 
     // Badges
+    const categoryBadge = event.category !== 'autres'
+      ? `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`
+      : '';
     const freeHtml = event.isFree ? `<span class="badge badge-free">Gratuit</span>` : '';
-    document.getElementById('detail-badges').innerHTML =
-      `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>${freeHtml}`;
+    document.getElementById('detail-badges').innerHTML = `${categoryBadge}${freeHtml}`;
 
     // Title
     document.getElementById('detail-title').textContent = event.title;
