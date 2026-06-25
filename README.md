@@ -21,11 +21,11 @@ cp .env.example .env
 ### 2. Démarrer la base de données
 
 ```bash
-docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml up -d --force-recreate
 ```
 
-- PostgreSQL accessible sur `localhost:5432`
-- Adminer accessible sur [http://localhost:8081](http://localhost:8081)
+- PostgreSQL accessible sur `localhost:5433`
+- Adminer accessible sur [http://localhost:8082](http://localhost:8082)
   - Système : PostgreSQL
   - Serveur : `postgres`
   - Utilisateur / Mot de passe / Base : `lagrue`
@@ -62,6 +62,7 @@ L'application est disponible sur [http://localhost:3000](http://localhost:3000).
 | `npm run db:seed` | Insère des données fictives (TRUNCATE + INSERT) |
 | `npm test` | Lance les tests Jest |
 | `npm run test:watch` | Tests en mode watch |
+| `npm run job:run` | Déclenche le job de scraping en local |
 
 ## Structure du projet
 

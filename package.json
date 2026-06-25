@@ -10,6 +10,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
     "db:seed": "tsx scripts/seed.ts",
+    "job:run": "tsx scripts/run-job.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src"
