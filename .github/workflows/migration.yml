@@ -1,5 +1,8 @@
 name: Migration
 
+# Désactivé — à réactiver une fois Supabase et Render configurés.
+# 1. Ajouter le secret MIGRATION_DATABASE_URL dans GitHub (Settings → Secrets)
+# 2. Retirer le `if: false` sur le job migrate ci-dessous
 on:
   workflow_dispatch:
 
@@ -7,6 +10,7 @@ jobs:
   migrate:
     name: Run DB migrations
     runs-on: ubuntu-latest
+    if: false
     steps:
       - uses: actions/checkout@v4
 

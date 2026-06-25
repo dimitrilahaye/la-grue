@@ -1,5 +1,9 @@
 name: Deploy
 
+# Désactivé — à réactiver une fois Supabase et Render configurés.
+# 1. Créer le Web Service sur Render et récupérer l'URL du deploy hook
+# 2. Ajouter le secret RENDER_DEPLOY_HOOK_URL dans GitHub (Settings → Secrets)
+# 3. Retirer le `if: false` sur le job deploy ci-dessous
 on:
   workflow_run:
     workflows: [Integration]
@@ -10,7 +14,7 @@ jobs:
   deploy:
     name: Deploy to Render
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: false
     steps:
       - name: Trigger Render deploy hook
         run: curl -fsS "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
