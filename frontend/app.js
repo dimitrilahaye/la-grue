@@ -7,6 +7,7 @@ const state = {
   limit: 20,
   total: 0,
   loading: false,
+  availableDates: new Set(),
 };
 
 // === Helpers ===============================================================
@@ -107,6 +108,13 @@ async function fetchEventById(id) {
 
 async function fetchCities() {
   const res = await fetch('/api/cities');
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.data ?? [];
+}
+
+async function fetchEventDates() {
+  const res = await fetch('/api/dates');
   if (!res.ok) return [];
   const data = await res.json();
   return data.data ?? [];
@@ -351,6 +359,25 @@ function clearIframe() {
   iframeEl.onload = null;
 }
 
+// === Date picker ===========================================================
+async function initDatePicker() {
+  try {
+    const dates = await fetchEventDates();
+    if (dates.length === 0) return;
+    state.availableDates = new Set(dates);
+    const picker = document.getElementById('date-picker');
+    picker.min = dates[0];
+    picker.max = dates[dates.length - 1];
+  } catch (_) {}
+}
+
+function nearestAvailableDate(dateStr) {
+  if (state.availableDates.size === 0) return dateStr;
+  const sorted = [...state.availableDates].sort();
+  const next = sorted.find(d => d >= dateStr);
+  return next ?? sorted[sorted.length - 1];
+}
+
 // === City select ===========================================================
 async function initCitySelect() {
   const select = document.getElementById('city-select');
@@ -368,6 +395,7 @@ async function initCitySelect() {
 // === Event listeners =======================================================
 function init() {
   updateDayLabel();
+  initDatePicker();
   initCitySelect();
 
   // Day navigation
@@ -393,12 +421,14 @@ function init() {
   });
 
   document.getElementById('date-picker').addEventListener('change', (e) => {
-    if (e.target.value) {
-      state.currentDate = e.target.value;
-      state.offset = 0;
-      updateDayLabel();
-      loadEvents();
-    }
+    if (!e.target.value) return;
+    const picked = e.target.value;
+    state.currentDate = (state.availableDates.size > 0 && !state.availableDates.has(picked))
+      ? nearestAvailableDate(picked)
+      : picked;
+    state.offset = 0;
+    updateDayLabel();
+    loadEvents();
   });
 
   // Search form

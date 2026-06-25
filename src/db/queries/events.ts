@@ -1,4 +1,4 @@
-import { and, eq, gte, lt, ilike, count, isNotNull, asc } from 'drizzle-orm';
+import { and, eq, gte, lt, ilike, count, isNotNull, asc, sql } from 'drizzle-orm';
 import { db } from '../client';
 import { events, type Event } from '../schema';
 
@@ -84,4 +84,13 @@ export async function findCities(): Promise<string[]> {
     .where(isNotNull(events.city))
     .orderBy(asc(events.city));
   return rows.map((r) => r.city as string);
+}
+
+export async function findEventDates(): Promise<string[]> {
+  const result = await db.execute(
+    sql`SELECT DISTINCT (start_at AT TIME ZONE 'Europe/Paris')::date::text AS event_date
+        FROM events
+        ORDER BY event_date ASC`
+  );
+  return result.map((row) => (row as { event_date: string }).event_date);
 }
