@@ -131,10 +131,18 @@ Retourne `202 Accepted` si le job démarre, `409` si un job est déjà en cours.
 
 ## Sources de données
 
+Le job tourne chaque nuit à 3h et persiste les événements de la semaine en cours et de la semaine suivante.
+
+### Sources actives
+
 | Source | Type | Couverture |
 |---|---|---|
-| Nantes Métropole API | API JSON (OpenDataSoft) | Nantes + métropole |
-| Pays de la Loire API | API JSON (OpenAgenda) | Loire-Atlantique (dept. 44) |
-| WIK Nantes | Scraping HTML | Nantes |
+| [Nantes Métropole API](https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records) | API JSON (OpenDataSoft) | Nantes + métropole |
+| [Pays de la Loire API](https://data.paysdelaloire.fr/api/explore/v2.1/catalog/datasets/agenda-culture-de-la-region-des-pays-de-la-loire/records) | API JSON (OpenAgenda) | Loire-Atlantique — dataset actuellement peu alimenté pour 2026 |
+| [WIK Nantes](https://www.wik-nantes.fr/agenda) | Scraping HTML (Cheerio) | Nantes |
 
-Le job tourne chaque nuit à 3h et persiste les événements de la semaine en cours et de la semaine suivante.
+### Sources prévues (v2)
+
+| Source | Type | Pourquoi reporté |
+|---|---|---|
+| [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping HTML | Site rendu côté client (JS) — nécessite Playwright ou Puppeteer, non justifié en v1 |
