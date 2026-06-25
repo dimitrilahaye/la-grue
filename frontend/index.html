@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#F5C518" />
+  <meta name="description" content="Les sorties à Nantes et sa région" />
+  <title>La Grue</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <img src="/logo.svg" alt="" width="36" height="36" aria-hidden="true" />
+        <span class="logo-text">La Grue</span>
+      </div>
+      <p class="tagline">Sorties à Nantes</p>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- Navigation par jour -->
+    <nav class="day-nav" aria-label="Navigation par jour">
+      <button class="day-btn" id="prev-day" aria-label="Jour précédent">&#8592;</button>
+      <div class="day-label" id="day-label" aria-live="polite">Aujourd'hui</div>
+      <button class="day-btn" id="next-day" aria-label="Jour suivant">&#8594;</button>
+    </nav>
+
+    <!-- Formulaire de recherche -->
+    <section class="search-section" aria-label="Filtrer les événements">
+      <form class="search-form" id="search-form" role="search">
+        <div class="field-group">
+          <label for="category-select" class="field-label">Catégorie</label>
+          <select id="category-select" name="category" class="field-input">
+            <option value="">Toutes</option>
+            <option value="bars-soirees">Bars / soirées</option>
+            <option value="concerts-musique">Concerts / musique</option>
+            <option value="expositions-arts">Expositions / arts</option>
+            <option value="spectacles-theatre">Spectacles / théâtre</option>
+            <option value="festivals">Festivals</option>
+            <option value="ginguettes-guinguettes">Ginguettes / guinguettes</option>
+            <option value="sexpo">Sexpo</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="city-input" class="field-label">Ville</label>
+          <input type="text" id="city-input" name="city" class="field-input" placeholder="Nantes" autocomplete="off" />
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Chercher</button>
+          <button type="reset" class="btn btn-ghost" id="reset-btn">Réinitialiser</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Liste des événements -->
+    <section class="events-section" aria-label="Événements">
+      <div id="events-list" class="events-list" role="list" aria-live="polite">
+        <div class="loading-state" id="loading-state" aria-label="Chargement...">
+          <div class="spinner" aria-hidden="true"></div>
+          <span>Chargement des événements...</span>
+        </div>
+      </div>
+      <div class="load-more-wrap" id="load-more-wrap" hidden>
+        <button class="btn btn-outline" id="load-more-btn">Voir plus</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Panneau de détail -->
+  <div class="detail-overlay" id="detail-overlay" hidden aria-modal="true" role="dialog" aria-labelledby="detail-title">
+    <div class="detail-panel">
+      <button class="detail-close" id="detail-close" aria-label="Fermer la fiche">&#10005;</button>
+
+      <div class="detail-image-wrap" id="detail-image-wrap">
+        <img id="detail-image" src="" alt="" class="detail-image" />
+      </div>
+
+      <div class="detail-body">
+        <div class="detail-badges" id="detail-badges"></div>
+        <h2 class="detail-title" id="detail-title"></h2>
+        <div class="detail-meta" id="detail-meta"></div>
+        <p class="detail-description" id="detail-description"></p>
+        <div class="detail-price" id="detail-price"></div>
+
+        <div class="detail-actions" id="detail-actions"></div>
+
+        <!-- iFrame opt-in -->
+        <div class="iframe-section" id="iframe-section" hidden>
+          <div class="iframe-wrap" id="iframe-wrap">
+            <div class="iframe-overlay" id="iframe-overlay">
+              <span class="iframe-loading-text">Chargement de l'aperçu...</span>
+            </div>
+            <div class="iframe-fallback" id="iframe-fallback" hidden>
+              <p>Ce site ne peut pas être affiché ici.</p>
+              <a id="iframe-fallback-link" href="#" target="_blank" rel="noopener noreferrer">Ouvrir dans un nouvel onglet &#8599;</a>
+            </div>
+            <iframe id="detail-iframe" class="detail-iframe" title="Aperçu de la page source" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="close-iframe-btn">Fermer l'aperçu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
