@@ -16,6 +16,7 @@ describe('db lazy client', () => {
     delete process.env.DATABASE_URL;
     expect(() => {
       jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('../client');
       });
     }).not.toThrow();
@@ -24,7 +25,8 @@ describe('db lazy client', () => {
   it('accessing a property on db without DATABASE_URL throws "DATABASE_URL is required"', () => {
     delete process.env.DATABASE_URL;
     jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { db } = require('../client') as { db: Record<string, unknown> };
       expect(() => {
         void db['execute'];
