@@ -8,6 +8,13 @@
       "when": 1782412754725,
       "tag": "0000_uneven_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782461322869,
+      "tag": "0001_remove_autres_category",
+      "breakpoints": true
     }
   ]
 }
