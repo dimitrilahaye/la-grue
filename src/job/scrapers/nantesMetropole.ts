@@ -30,6 +30,18 @@ interface NantesRecord {
   precisions_tarifs_evt?: string;
 }
 
+const AGENDA_BASE = 'https://metropole.nantes.fr/que-faire-a-nantes/agenda';
+
+function toNantesSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/[\s-]+/g, '-');
+}
+
 function buildDateRange(): { dateStart: string; dateEnd: string } {
   const now = new Date();
   const twoWeeksLater = new Date(now);
@@ -89,7 +101,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
         category,
         rawCategory: rawCategory || null,
         tags: [],
-        detailUrl: (r.lien_agenda && r.lien_agenda !== 'https://metropole.nantes.fr/que-faire-a-nantes/agenda' ? r.lien_agenda : null) ?? r.url_site ?? null,
+        detailUrl: `${AGENDA_BASE}/${toNantesSlug(r.nom)}`,
         imageUrl: r.media_url ?? null,
         isFree: r.gratuit ?? null,
         priceInfo: r.precisions_tarifs_evt ?? null,
