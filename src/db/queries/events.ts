@@ -100,6 +100,21 @@ export async function findEventDates(filters: { category?: string; city?: string
   return result.map((row) => (row as { event_date: string }).event_date);
 }
 
+export async function getCategoryCounts(filters: { city?: string } = {}): Promise<Record<string, number>> {
+  const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+  const cityFilter = filters.city ? sql`AND lower(city) LIKE ${'%' + filters.city.toLowerCase() + '%'}` : sql``;
+  const result = await db.execute(
+    sql`SELECT category, COUNT(*) AS total
+        FROM events
+        WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date
+        ${cityFilter}
+        GROUP BY category`
+  );
+  return Object.fromEntries(
+    result.map((row) => [(row as { category: string; total: string }).category, Number((row as { category: string; total: string }).total)])
+  );
+}
+
 export async function getUpcomingStats(filters: { category?: string; city?: string } = {}): Promise<{ total: number; daysCount: number }> {
   const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
   const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { findEvents, findEventById, findCities, findEventDates, getUpcomingStats } from '../../db/queries/events';
+import { findEvents, findEventById, findCities, findEventDates, getUpcomingStats, getCategoryCounts } from '../../db/queries/events';
 import { CATEGORIES } from '../../types/event';
 
 const router = Router();
@@ -66,6 +66,19 @@ router.get('/stats', async (req: Request, res: Response) => {
     res.json(stats);
   } catch (err) {
     console.error('[GET /api/stats] Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/categories/counts', async (req: Request, res: Response) => {
+  try {
+    const { city } = req.query;
+    const counts = await getCategoryCounts({
+      city: typeof city === 'string' ? city : undefined,
+    });
+    res.json(counts);
+  } catch (err) {
+    console.error('[GET /api/categories/counts] Error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

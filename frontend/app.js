@@ -123,6 +123,14 @@ async function fetchEventDates({ category, city } = {}) {
   return data.data ?? [];
 }
 
+async function fetchCategoryCounts({ city } = {}) {
+  const params = new URLSearchParams();
+  if (city) params.set('city', city);
+  const res = await fetch(`/api/categories/counts?${params}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 async function fetchStats({ category, city } = {}) {
   const params = new URLSearchParams();
   if (category) params.set('category', category);
@@ -487,6 +495,27 @@ function nearestAvailableDate(dateStr) {
   return next ?? sorted[sorted.length - 1];
 }
 
+// === Category select =======================================================
+async function updateCategorySelect(city = '') {
+  const select = document.getElementById('category-select');
+  const counts = await fetchCategoryCounts({ city: city || undefined });
+  if (!counts) return;
+  for (const opt of select.options) {
+    if (!opt.value) continue;
+    const n = counts[opt.value] ?? 0;
+    const label = opt.value === 'bars-soirees' ? 'Bars / soirées'
+      : opt.value === 'concerts-musique' ? 'Concerts / musique'
+      : opt.value === 'expositions-arts' ? 'Expositions / arts'
+      : opt.value === 'spectacles-theatre' ? 'Spectacles / théâtre'
+      : opt.value === 'festivals' ? 'Festivals'
+      : opt.value === 'ginguettes-guinguettes' ? 'Ginguettes / guinguettes'
+      : opt.value === 'sexpo' ? 'Sexpo'
+      : 'Autres';
+    opt.textContent = `${label} (${n})`;
+    opt.disabled = n === 0;
+  }
+}
+
 // === City select ===========================================================
 async function initCitySelect() {
   const select = document.getElementById('city-select');
@@ -506,6 +535,7 @@ function init() {
   updateDayLabel();
   initDatePicker();
   initCitySelect();
+  updateCategorySelect();
 
   // Day navigation
   document.getElementById('prev-day').addEventListener('click', () => {
@@ -537,6 +567,7 @@ function init() {
     state.offset = 0;
     loadEvents();
     refreshDatePicker();
+    updateCategorySelect(state.currentCity);
   });
 
   document.getElementById('reset-btn').addEventListener('click', () => {
@@ -547,6 +578,7 @@ function init() {
     document.getElementById('city-select').value = '';
     loadEvents();
     refreshDatePicker();
+    updateCategorySelect();
   });
 
   // Load more
