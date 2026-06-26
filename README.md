@@ -50,6 +50,15 @@ npm run dev
 
 L'application est disponible sur [http://localhost:3000](http://localhost:3000).
 
+## Makefile
+
+| Commande | Description |
+|---|---|
+| `make api` | Lance Docker (force-recreate) + démarre le serveur en mode watch |
+| `make job` | Lance Docker (force-recreate) + déclenche le job de scraping |
+| `make quality` | Lint + tests unitaires + build (fail-fast) |
+| `make help` | Liste toutes les commandes disponibles |
+
 ## Scripts disponibles
 
 | Commande | Description |
