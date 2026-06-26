@@ -143,7 +143,7 @@ function renderCard(event) {
   const time = formatTime(event.startAt);
 
   const shareHtml = navigator.share
-    ? `<button class="card-share-btn" aria-label="Partager">&#8679;</button>`
+    ? `<button class="card-share-btn btn btn-outline btn-sm" aria-label="Partager">&#8679;</button>`
     : '';
 
   article.innerHTML = `
