@@ -73,6 +73,10 @@ export function createApp() {
   app.use(express.static(frontendDir));
   app.use(express.static(path.resolve(__dirname, '../..', 'assets')));
 
+  // Vendor assets from node_modules
+  const flatpickrDist = path.resolve(__dirname, '../..', 'node_modules/flatpickr/dist');
+  app.use('/vendor/flatpickr', express.static(flatpickrDist));
+
   // API routes
   app.use('/api', apiLimiter, eventsRouter);
 
