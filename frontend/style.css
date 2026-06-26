@@ -94,11 +94,11 @@ a { color: var(--color-accent-dark); }
   height: 32px;
   border-radius: 50%;
   font-size: 1.25rem;
-  color: var(--color-text-light);
+  color: var(--color-accent);
   text-decoration: none;
-  transition: color 0.15s, background 0.15s;
+  transition: background 0.15s;
 }
-.header-info-btn:hover { color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.header-info-btn:hover { background: color-mix(in srgb, var(--color-accent) 15%, transparent); }
 
 /* === Sources page ========================================================= */
 .sources-section { padding-top: var(--space-md); }
