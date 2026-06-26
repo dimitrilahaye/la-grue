@@ -131,6 +131,14 @@ async function fetchCategoryCounts({ city } = {}) {
   return res.json();
 }
 
+async function fetchCityCounts({ category } = {}) {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  const res = await fetch(`/api/cities/counts?${params}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
 async function fetchStats({ category, city } = {}) {
   const params = new URLSearchParams();
   if (category) params.set('category', category);
@@ -516,6 +524,18 @@ async function updateCategorySelect(city = '') {
   }
 }
 
+async function updateCitySelect(category = '') {
+  const select = document.getElementById('city-select');
+  const counts = await fetchCityCounts({ category: category || undefined });
+  if (!counts) return;
+  for (const opt of select.options) {
+    if (!opt.value) continue;
+    const n = counts[opt.value] ?? 0;
+    opt.textContent = `${opt.value} (${n})`;
+    opt.disabled = n === 0;
+  }
+}
+
 // === City select ===========================================================
 async function initCitySelect() {
   const select = document.getElementById('city-select');
@@ -534,7 +554,7 @@ async function initCitySelect() {
 function init() {
   updateDayLabel();
   initDatePicker();
-  initCitySelect();
+  initCitySelect().then(() => updateCitySelect());
   updateCategorySelect();
 
   // Day navigation
@@ -559,6 +579,14 @@ function init() {
     loadEvents();
   });
 
+  // Live cross-update between dropdowns
+  document.getElementById('category-select').addEventListener('change', (e) => {
+    updateCitySelect(e.target.value);
+  });
+  document.getElementById('city-select').addEventListener('change', (e) => {
+    updateCategorySelect(e.target.value);
+  });
+
   // Search form
   document.getElementById('search-form').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -567,7 +595,6 @@ function init() {
     state.offset = 0;
     loadEvents();
     refreshDatePicker();
-    updateCategorySelect(state.currentCity);
   });
 
   document.getElementById('reset-btn').addEventListener('click', () => {
@@ -579,6 +606,7 @@ function init() {
     loadEvents();
     refreshDatePicker();
     updateCategorySelect();
+    updateCitySelect();
   });
 
   // Load more

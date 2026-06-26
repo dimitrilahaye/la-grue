@@ -115,6 +115,22 @@ export async function getCategoryCounts(filters: { city?: string } = {}): Promis
   );
 }
 
+export async function getCityCounts(filters: { category?: string } = {}): Promise<Record<string, number>> {
+  const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+  const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;
+  const result = await db.execute(
+    sql`SELECT city, COUNT(*) AS total
+        FROM events
+        WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date
+        AND city IS NOT NULL
+        ${categoryFilter}
+        GROUP BY city`
+  );
+  return Object.fromEntries(
+    result.map((row) => [(row as { city: string; total: string }).city, Number((row as { city: string; total: string }).total)])
+  );
+}
+
 export async function getUpcomingStats(filters: { category?: string; city?: string } = {}): Promise<{ total: number; daysCount: number }> {
   const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
   const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;
