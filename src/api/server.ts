@@ -10,9 +10,11 @@ import internalRouter from './routes/internal';
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN ?? 'http://localhost:3000';
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 120,
+  windowMs: 15 * 60 * 1000,
+  max: isDev ? 0 : 120,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
@@ -20,8 +22,8 @@ const apiLimiter = rateLimit({
 
 // Strict limiter for the internal endpoint — Render Cron calls it once per night
 const internalLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
+  windowMs: 60 * 60 * 1000,
+  max: isDev ? 0 : 10,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests.' },
