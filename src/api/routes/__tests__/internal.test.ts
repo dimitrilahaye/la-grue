@@ -5,9 +5,7 @@ jest.mock('../../../job', () => ({
   runJob: jest.fn().mockResolvedValue([]),
 }));
 
-const CRON_SECRET = 'test-secret-123';
-process.env.CRON_SECRET = CRON_SECRET;
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+const CRON_SECRET = process.env.CRON_SECRET!;
 
 const app = createApp();
 

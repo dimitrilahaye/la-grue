@@ -4,8 +4,6 @@ import * as eventsQueries from '../../../db/queries/events';
 
 jest.mock('../../../db/queries/events');
 
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
-
 const app = createApp();
 
 const mockResult = {
