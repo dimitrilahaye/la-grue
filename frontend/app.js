@@ -506,8 +506,12 @@ async function updateCategorySelect() {
   const select = document.getElementById('category-select');
   const counts = await fetchCategoryCounts();
   if (!counts) return;
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
   for (const opt of select.options) {
-    if (!opt.value) continue;
+    if (!opt.value) {
+      opt.textContent = `Toutes (${total})`;
+      continue;
+    }
     const n = counts[opt.value] ?? 0;
     const label = opt.value === 'bars-soirees' ? 'Bars / soirées'
       : opt.value === 'concerts-musique' ? 'Concerts / musique'
@@ -526,8 +530,12 @@ async function updateCitySelect(category = '') {
   const select = document.getElementById('city-select');
   const counts = await fetchCityCounts({ category: category || undefined });
   if (!counts) return;
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
   for (const opt of select.options) {
-    if (!opt.value) continue;
+    if (!opt.value) {
+      opt.textContent = `Toutes les villes (${total})`;
+      continue;
+    }
     const n = counts[opt.value] ?? 0;
     opt.textContent = `${opt.value} (${n})`;
     opt.disabled = n === 0;
