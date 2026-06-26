@@ -25,6 +25,7 @@
   <link rel="apple-touch-startup-image"
         media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
         href="/splash-1290x2796.png" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
@@ -46,7 +47,7 @@
       <button class="day-btn" id="next-day" aria-label="Jour suivant">&#8594;</button>
       <div class="day-nav-tools">
         <button class="day-today-btn" id="today-btn">Aujourd'hui</button>
-        <input type="date" id="date-picker" class="day-date-input" aria-label="Choisir une date" />
+        <input type="text" id="date-picker" class="day-date-input" aria-label="Choisir une date" readonly />
       </div>
     </nav>
 
@@ -130,6 +131,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
   <script src="/app.js"></script>
   <script src="/sw-register.js"></script>
 </body>

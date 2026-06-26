@@ -231,8 +231,7 @@ function updateLoadMore() {
 }
 
 function syncDatePicker() {
-  const picker = document.getElementById('date-picker');
-  picker.value = state.currentDate;
+  if (fpInstance) fpInstance.setDate(state.currentDate, false);
   document.getElementById('today-btn').classList.toggle('is-today', isToday(state.currentDate));
 }
 
@@ -433,14 +432,28 @@ function clearIframe() {
 }
 
 // === Date picker ===========================================================
+let fpInstance = null;
+
 async function initDatePicker() {
   try {
     const dates = await fetchEventDates();
     if (dates.length === 0) return;
     state.availableDates = new Set(dates);
-    const picker = document.getElementById('date-picker');
-    picker.min = dates[0];
-    picker.max = dates[dates.length - 1];
+
+    fpInstance = flatpickr('#date-picker', {
+      locale: 'fr',
+      enable: dates,
+      defaultDate: state.currentDate,
+      disableMobile: true,
+      onChange([date]) {
+        if (!date) return;
+        const picked = date.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+        state.currentDate = picked;
+        state.offset = 0;
+        updateDayLabel();
+        loadEvents();
+      },
+    });
   } catch (_) {}
 }
 
@@ -488,17 +501,6 @@ function init() {
 
   document.getElementById('today-btn').addEventListener('click', () => {
     state.currentDate = todayDateStr();
-    state.offset = 0;
-    updateDayLabel();
-    loadEvents();
-  });
-
-  document.getElementById('date-picker').addEventListener('change', (e) => {
-    if (!e.target.value) return;
-    const picked = e.target.value;
-    state.currentDate = (state.availableDates.size > 0 && !state.availableDates.has(picked))
-      ? nearestAvailableDate(picked)
-      : picked;
     state.offset = 0;
     updateDayLabel();
     loadEvents();

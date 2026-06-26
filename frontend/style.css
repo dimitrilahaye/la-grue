@@ -140,6 +140,14 @@ a { color: var(--color-accent-dark); }
   cursor: pointer;
 }
 .day-date-input:focus { outline: none; border-color: var(--color-accent); }
+
+/* flatpickr overrides */
+.flatpickr-calendar { font-family: var(--font-sans); border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover { background: var(--color-accent); border-color: var(--color-accent); color: #1A1A1A; }
+.flatpickr-day:hover { background: color-mix(in srgb, var(--color-accent) 20%, transparent); border-color: transparent; }
+.flatpickr-day.today { border-color: var(--color-accent); }
+.flatpickr-day.today:hover { background: color-mix(in srgb, var(--color-accent) 20%, transparent); }
 .day-btn {
   min-width: 44px;
   min-height: 44px;
