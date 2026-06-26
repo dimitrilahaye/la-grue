@@ -86,10 +86,15 @@ export async function findCities(): Promise<string[]> {
   return rows.map((r) => r.city as string);
 }
 
-export async function findEventDates(): Promise<string[]> {
+export async function findEventDates(filters: { category?: string; city?: string } = {}): Promise<string[]> {
+  const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;
+  const cityFilter = filters.city ? sql`AND lower(city) LIKE ${'%' + filters.city.toLowerCase() + '%'}` : sql``;
   const result = await db.execute(
     sql`SELECT DISTINCT (start_at AT TIME ZONE 'Europe/Paris')::date::text AS event_date
         FROM events
+        WHERE 1=1
+        ${categoryFilter}
+        ${cityFilter}
         ORDER BY event_date ASC`
   );
   return result.map((row) => (row as { event_date: string }).event_date);

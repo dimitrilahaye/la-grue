@@ -70,9 +70,13 @@ router.get('/stats', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/dates', async (_req: Request, res: Response) => {
+router.get('/dates', async (req: Request, res: Response) => {
   try {
-    const dates = await findEventDates();
+    const { category, city } = req.query;
+    const dates = await findEventDates({
+      category: typeof category === 'string' ? category : undefined,
+      city: typeof city === 'string' ? city : undefined,
+    });
     res.json({ data: dates });
   } catch (err) {
     console.error('[GET /api/dates] Error:', err);

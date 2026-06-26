@@ -148,6 +148,11 @@ a { color: var(--color-accent-dark); }
 .flatpickr-day:hover { background: color-mix(in srgb, var(--color-accent) 20%, transparent); border-color: transparent; }
 .flatpickr-day.today { border-color: var(--color-accent); }
 .flatpickr-day.today:hover { background: color-mix(in srgb, var(--color-accent) 20%, transparent); }
+/* Jours avec des événements : texte jaune gras */
+.flatpickr-day.has-events:not(.selected) {
+  color: var(--color-accent);
+  font-weight: 700;
+}
 .day-btn {
   min-width: 44px;
   min-height: 44px;

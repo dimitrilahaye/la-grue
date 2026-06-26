@@ -113,8 +113,11 @@ async function fetchCities() {
   return data.data ?? [];
 }
 
-async function fetchEventDates() {
-  const res = await fetch('/api/dates');
+async function fetchEventDates({ category, city } = {}) {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  if (city) params.set('city', city);
+  const res = await fetch(`/api/dates?${params}`);
   if (!res.ok) return [];
   const data = await res.json();
   return data.data ?? [];
@@ -445,6 +448,12 @@ async function initDatePicker() {
       enable: dates,
       defaultDate: state.currentDate,
       disableMobile: true,
+      onDayCreate(_dObj, _dStr, _fp, dayElem) {
+        const dateStr = dayElem.dateObj.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+        if (state.availableDates.has(dateStr)) {
+          dayElem.classList.add('has-events');
+        }
+      },
       onChange([date]) {
         if (!date) return;
         const picked = date.toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
@@ -454,6 +463,18 @@ async function initDatePicker() {
         loadEvents();
       },
     });
+  } catch (_) {}
+}
+
+async function refreshDatePicker() {
+  if (!fpInstance) return;
+  try {
+    const dates = await fetchEventDates({
+      category: state.currentCategory,
+      city: state.currentCity,
+    });
+    state.availableDates = new Set(dates);
+    fpInstance.set('enable', dates.length > 0 ? dates : []);
   } catch (_) {}
 }
 
@@ -513,6 +534,7 @@ function init() {
     state.currentCity = document.getElementById('city-select').value;
     state.offset = 0;
     loadEvents();
+    refreshDatePicker();
   });
 
   document.getElementById('reset-btn').addEventListener('click', () => {
@@ -522,6 +544,7 @@ function init() {
     document.getElementById('category-select').value = '';
     document.getElementById('city-select').value = '';
     loadEvents();
+    refreshDatePicker();
   });
 
   // Load more
