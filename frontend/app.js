@@ -120,6 +120,12 @@ async function fetchEventDates() {
   return data.data ?? [];
 }
 
+async function fetchStats() {
+  const res = await fetch('/api/stats');
+  if (!res.ok) return null;
+  return res.json();
+}
+
 // === Rendering =============================================================
 function renderCard(event) {
   const article = document.createElement('article');
@@ -200,10 +206,20 @@ function renderList(events, append = false) {
   }
 }
 
-function updateResultsCount() {
+async function updateResultsCount() {
   const el = document.getElementById('results-count');
+  const dayLabel = state.currentDate === todayDateStr() ? "aujourd'hui" : `le ${formatDate(state.currentDate)}`;
+  const dayPart = state.total === 0
+    ? `Aucun résultat ${dayLabel}`
+    : `${state.total} résultat${state.total > 1 ? 's' : ''} ${dayLabel}`;
+
+  el.textContent = dayPart;
   el.hidden = false;
-  el.textContent = state.total === 0 ? 'Aucun résultat' : `${state.total} résultat${state.total > 1 ? 's' : ''}`;
+
+  const stats = await fetchStats();
+  if (stats && stats.total > 0) {
+    el.textContent = `${dayPart} · ${stats.total} sur les ${stats.daysCount} prochains jours`;
+  }
 }
 
 function updateLoadMore() {
