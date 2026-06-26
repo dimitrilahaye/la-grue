@@ -206,8 +206,15 @@ a { color: var(--color-accent-dark); }
 }
 .form-actions {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
   flex-shrink: 0;
+}
+.results-count {
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+  margin-left: auto;
+  white-space: nowrap;
 }
 
 /* === Buttons ============================================================== */

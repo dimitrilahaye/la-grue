@@ -200,6 +200,12 @@ function renderList(events, append = false) {
   }
 }
 
+function updateResultsCount() {
+  const el = document.getElementById('results-count');
+  el.hidden = false;
+  el.textContent = state.total === 0 ? 'Aucun résultat' : `${state.total} résultat${state.total > 1 ? 's' : ''}`;
+}
+
 function updateLoadMore() {
   const wrap = document.getElementById('load-more-wrap');
   wrap.hidden = state.offset + state.limit >= state.total;
@@ -239,6 +245,7 @@ async function loadEvents(append = false) {
     state.total = result.total;
     renderList(result.data, append);
     updateLoadMore();
+    updateResultsCount();
   } catch (_err) {
     const list = document.getElementById('events-list');
     document.getElementById('loading-state').hidden = true;
