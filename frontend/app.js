@@ -123,10 +123,8 @@ async function fetchEventDates({ category, city } = {}) {
   return data.data ?? [];
 }
 
-async function fetchCategoryCounts({ city } = {}) {
-  const params = new URLSearchParams();
-  if (city) params.set('city', city);
-  const res = await fetch(`/api/categories/counts?${params}`);
+async function fetchCategoryCounts() {
+  const res = await fetch('/api/categories/counts');
   if (!res.ok) return null;
   return res.json();
 }
@@ -504,9 +502,9 @@ function nearestAvailableDate(dateStr) {
 }
 
 // === Category select =======================================================
-async function updateCategorySelect(city = '') {
+async function updateCategorySelect() {
   const select = document.getElementById('category-select');
-  const counts = await fetchCategoryCounts({ city: city || undefined });
+  const counts = await fetchCategoryCounts();
   if (!counts) return;
   for (const opt of select.options) {
     if (!opt.value) continue;
@@ -579,12 +577,9 @@ function init() {
     loadEvents();
   });
 
-  // Live cross-update between dropdowns
+  // Selecting a category updates city counts for that category
   document.getElementById('category-select').addEventListener('change', (e) => {
     updateCitySelect(e.target.value);
-  });
-  document.getElementById('city-select').addEventListener('change', (e) => {
-    updateCategorySelect(e.target.value);
   });
 
   // Search form
