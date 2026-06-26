@@ -340,6 +340,8 @@ function openDetail(id) {
     if (event.detailUrl) {
       actionsHtml += `<a href="${escapeHtml(event.detailUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">Voir la source &#8599;</a>`;
       actionsHtml += `<button class="btn btn-outline btn-sm" id="open-iframe-btn" data-url="${escapeHtml(event.detailUrl)}">Aperçu</button>`;
+    } else {
+      actionsHtml += `<span class="btn btn-ghost btn-sm" aria-disabled="true" title="Pas de source disponible">Voir la source &#8599;</span>`;
     }
     if (navigator.share) {
       actionsHtml += `<button class="btn btn-outline btn-sm" id="share-btn">Partager</button>`;
