@@ -78,12 +78,13 @@ export async function findEventById(id: string): Promise<Event | null> {
 }
 
 export async function findCities(): Promise<string[]> {
-  const rows = await db
-    .selectDistinct({ city: events.city })
-    .from(events)
-    .where(isNotNull(events.city))
-    .orderBy(asc(events.city));
-  return rows.map((r) => r.city as string);
+  const result = await db.execute(
+    sql`SELECT DISTINCT initcap(lower(city)) AS city
+        FROM events
+        WHERE city IS NOT NULL
+        ORDER BY 1`
+  );
+  return result.map((row) => (row as { city: string }).city);
 }
 
 export async function findEventDates(filters: { category?: string; city?: string } = {}): Promise<string[]> {
@@ -119,12 +120,12 @@ export async function getCityCounts(filters: { category?: string } = {}): Promis
   const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
   const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;
   const result = await db.execute(
-    sql`SELECT city, COUNT(*) AS total
+    sql`SELECT initcap(lower(city)) AS city, COUNT(*) AS total
         FROM events
         WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date
         AND city IS NOT NULL
         ${categoryFilter}
-        GROUP BY city`
+        GROUP BY lower(city)`
   );
   return Object.fromEntries(
     result.map((row) => [(row as { city: string; total: string }).city, Number((row as { city: string; total: string }).total)])
