@@ -87,6 +87,7 @@ function parseArticle($: cheerio.CheerioAPI, el: AnyNode): NormalizedEvent | nul
     : null;
 
   const category = mapWikCategory(categoryPath);
+  if (!category) return null;
 
   return {
     source: 'wik',

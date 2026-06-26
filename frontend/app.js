@@ -63,7 +63,6 @@ function categoryIcon(cat) {
     'festivals': '🎪',
     'ginguettes-guinguettes': '🎡',
     'sexpo': '🌶️',
-    'autres': '📌',
   };
   return icons[cat] ?? '📌';
 }
@@ -77,7 +76,6 @@ function categoryLabel(cat) {
     'festivals': 'Festivals',
     'ginguettes-guinguettes': 'Ginguettes / guinguettes',
     'sexpo': 'Sexpo',
-    'autres': 'Autres',
   };
   return labels[cat] ?? cat;
 }
@@ -158,9 +156,7 @@ function renderCard(event) {
     ? `<div class="card-image"><img src="${escapeHtml(event.imageUrl)}" alt="" loading="lazy" /></div>`
     : `<div class="card-image-placeholder">${categoryIcon(event.category)}</div>`;
 
-  const categoryBadgeHtml = event.category !== 'autres'
-    ? `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`
-    : '';
+  const categoryBadgeHtml = `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`;
 
   const freeHtml = event.isFree
     ? `<span class="badge badge-free">Gratuit</span>`
@@ -315,9 +311,7 @@ function openDetail(id) {
     }
 
     // Badges
-    const categoryBadge = event.category !== 'autres'
-      ? `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`
-      : '';
+    const categoryBadge = `<span class="badge badge-category">${escapeHtml(categoryLabel(event.category))}</span>`;
     const freeHtml = event.isFree ? `<span class="badge badge-free">Gratuit</span>` : '';
     document.getElementById('detail-badges').innerHTML = `${categoryBadge}${freeHtml}`;
 

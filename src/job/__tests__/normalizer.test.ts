@@ -14,8 +14,8 @@ describe('mapNantesMetropoleCategory', () => {
   it('maps festival to festivals', () => {
     expect(mapNantesMetropoleCategory('Festival', '')).toBe('festivals');
   });
-  it('falls back to autres for unknown types', () => {
-    expect(mapNantesMetropoleCategory('', '')).toBe('autres');
+  it('returns null for unknown types', () => {
+    expect(mapNantesMetropoleCategory('', '')).toBeNull();
   });
   it('maps sexpo category', () => {
     expect(mapNantesMetropoleCategory('Sexpo', '')).toBe('sexpo');
@@ -29,8 +29,8 @@ describe('mapPaysLoireCategory', () => {
   it('maps bal keyword to ginguettes-guinguettes', () => {
     expect(mapPaysLoireCategory('bal;danse')).toBe('ginguettes-guinguettes');
   });
-  it('falls back to autres for empty keywords', () => {
-    expect(mapPaysLoireCategory('')).toBe('autres');
+  it('returns null for empty keywords', () => {
+    expect(mapPaysLoireCategory('')).toBeNull();
   });
   it('maps opera to spectacles-theatre', () => {
     expect(mapPaysLoireCategory('opéra;classique')).toBe('spectacles-theatre');
@@ -44,8 +44,8 @@ describe('mapWikCategory', () => {
   it('maps expo path to expositions-arts', () => {
     expect(mapWikCategory('expo')).toBe('expositions-arts');
   });
-  it('maps loisir to autres', () => {
-    expect(mapWikCategory('loisir')).toBe('autres');
+  it('returns null for unrecognised path', () => {
+    expect(mapWikCategory('loisir')).toBeNull();
   });
   it('maps sexpo to sexpo', () => {
     expect(mapWikCategory('sexpo')).toBe('sexpo');

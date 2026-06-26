@@ -85,6 +85,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
 
       const rawCategory = [r.types_libelles, r.themes_libelles].filter(Boolean).join(' ');
       const category = mapNantesMetropoleCategory(r.types_libelles ?? '', r.themes_libelles ?? '');
+      if (!category) continue;
 
       events.push({
         source: 'nantes_metropole',

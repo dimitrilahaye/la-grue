@@ -6,7 +6,6 @@ export const CATEGORIES = [
   'festivals',
   'ginguettes-guinguettes',
   'sexpo',
-  'autres',
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -19,7 +18,6 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   'festivals': 'Festivals',
   'ginguettes-guinguettes': 'Ginguettes / guinguettes',
   'sexpo': 'Sexpo',
-  'autres': 'Autres',
 };
 
 export interface NormalizedEvent {

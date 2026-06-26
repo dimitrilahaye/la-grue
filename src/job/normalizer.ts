@@ -44,7 +44,6 @@ const WIK_URL_PATH_MAP: Record<string, Category> = {
   'guinguette': 'ginguettes-guinguettes',
   'bar': 'bars-soirees',
   'soiree': 'bars-soirees',
-  'loisir': 'autres',
 };
 
 function normalizeString(s: string): string {
@@ -56,18 +55,18 @@ function normalizeString(s: string): string {
     .trim();
 }
 
-export function mapNantesMetropoleCategory(rawTypes: string, rawThemes: string): Category {
+export function mapNantesMetropoleCategory(rawTypes: string, rawThemes: string): Category | null {
   const combined = `${rawTypes} ${rawThemes}`.toLowerCase();
   const normalized = normalizeString(combined);
 
   for (const [key, cat] of Object.entries(NANTES_METROPOLE_MAP)) {
     if (normalized.includes(normalizeString(key))) return cat;
   }
-  return 'autres';
+  return null;
 }
 
-export function mapPaysLoireCategory(keywords: string): Category {
-  if (!keywords) return 'autres';
+export function mapPaysLoireCategory(keywords: string): Category | null {
+  if (!keywords) return null;
   const parts = keywords.split(';').map((k) => normalizeString(k.trim()));
 
   for (const part of parts) {
@@ -75,15 +74,15 @@ export function mapPaysLoireCategory(keywords: string): Category {
       if (part.includes(normalizeString(key))) return cat;
     }
   }
-  return 'autres';
+  return null;
 }
 
-export function mapWikCategory(urlPath: string): Category {
+export function mapWikCategory(urlPath: string): Category | null {
   const normalized = normalizeString(urlPath);
   for (const [key, cat] of Object.entries(WIK_URL_PATH_MAP)) {
     if (normalized.includes(normalizeString(key))) return cat;
   }
-  return 'autres';
+  return null;
 }
 
 export function isValidCategory(cat: string): cat is Category {

@@ -77,6 +77,7 @@ export async function scrapePaysLoire(): Promise<NormalizedEvent[]> {
 
       const keywords = r.keywords_fr ?? '';
       const category = mapPaysLoireCategory(keywords);
+      if (!category) continue;
 
       events.push({
         source: 'pays_de_loire',
