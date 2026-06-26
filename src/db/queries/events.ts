@@ -1,4 +1,4 @@
-import { and, eq, gte, lt, ilike, count, isNotNull, asc, sql } from 'drizzle-orm';
+import { and, eq, gte, lt, ilike, count, sql } from 'drizzle-orm';
 import { db } from '../client';
 import { events, type Event } from '../schema';
 
