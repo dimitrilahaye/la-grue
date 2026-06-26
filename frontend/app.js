@@ -120,8 +120,11 @@ async function fetchEventDates() {
   return data.data ?? [];
 }
 
-async function fetchStats() {
-  const res = await fetch('/api/stats');
+async function fetchStats({ category, city } = {}) {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  if (city) params.set('city', city);
+  const res = await fetch(`/api/stats?${params}`);
   if (!res.ok) return null;
   return res.json();
 }
@@ -216,7 +219,7 @@ async function updateResultsCount() {
   el.textContent = dayPart;
   el.hidden = false;
 
-  const stats = await fetchStats();
+  const stats = await fetchStats({ category: state.currentCategory, city: state.currentCity });
   if (stats && stats.total > 0) {
     el.textContent = `${dayPart} · ${stats.total} sur les ${stats.daysCount} prochains jours`;
   }

@@ -95,13 +95,17 @@ export async function findEventDates(): Promise<string[]> {
   return result.map((row) => (row as { event_date: string }).event_date);
 }
 
-export async function getUpcomingStats(): Promise<{ total: number; daysCount: number }> {
+export async function getUpcomingStats(filters: { category?: string; city?: string } = {}): Promise<{ total: number; daysCount: number }> {
   const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+  const categoryFilter = filters.category ? sql`AND category = ${filters.category}` : sql``;
+  const cityFilter = filters.city ? sql`AND lower(city) LIKE ${'%' + filters.city.toLowerCase() + '%'}` : sql``;
   const result = await db.execute(
     sql`SELECT COUNT(*) AS total,
                COUNT(DISTINCT (start_at AT TIME ZONE 'Europe/Paris')::date) AS days_count
         FROM events
-        WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date`
+        WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date
+        ${categoryFilter}
+        ${cityFilter}`
   );
   const row = result[0] as { total: string; days_count: string };
   return { total: Number(row.total), daysCount: Number(row.days_count) };

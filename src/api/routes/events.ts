@@ -56,9 +56,13 @@ router.get('/events', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/stats', async (_req: Request, res: Response) => {
+router.get('/stats', async (req: Request, res: Response) => {
   try {
-    const stats = await getUpcomingStats();
+    const { category, city } = req.query;
+    const stats = await getUpcomingStats({
+      category: typeof category === 'string' ? category : undefined,
+      city: typeof city === 'string' ? city : undefined,
+    });
     res.json(stats);
   } catch (err) {
     console.error('[GET /api/stats] Error:', err);
