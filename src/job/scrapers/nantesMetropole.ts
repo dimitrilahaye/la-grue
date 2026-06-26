@@ -32,7 +32,7 @@ interface NantesRecord {
 
 const AGENDA_BASE = 'https://metropole.nantes.fr/que-faire-a-nantes/agenda';
 
-function toNantesSlug(title: string): string {
+export function toNantesSlug(title: string): string {
   return title
     .toLowerCase()
     .normalize('NFD')

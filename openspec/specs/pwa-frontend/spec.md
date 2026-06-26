@@ -24,20 +24,32 @@ La PWA SHALL afficher en en-tête la date du jour sélectionné (ex: "Aujourd'hu
 ---
 
 ### Requirement: Outils de navigation avancée
-La day-nav SHALL exposer un bouton "Aujourd'hui" (retour direct à la date du jour, mis en évidence visuellement quand on est sur le jour courant) et un date picker natif (`<input type="date">`) synchronisé bidirectionnellement avec les flèches ← →. À l'initialisation, le picker interroge `GET /api/dates` pour borner les dates disponibles et snapper automatiquement vers la date la plus proche ayant des événements si la date choisie n'en a pas.
+La day-nav SHALL exposer un bouton "Aujourd'hui" (retour direct à la date du jour, mis en évidence visuellement quand on est sur le jour courant) et un date picker **flatpickr** (installé via npm, servi depuis `/vendor/flatpickr/`, `disableMobile: true`) synchronisé bidirectionnellement avec les flèches ← →. À l'initialisation, le picker interroge `GET /api/dates?category=&city=` pour ne rendre actives (`enable`) que les dates ayant des événements ; les dates sans événements sont grisées. Les dates actives reçoivent la classe CSS `.has-events` via le callback `onDayCreate` (en consultant `state.availableDates`) et s'affichent en jaune gras. Le picker est rechargé (nouvelles dates `enable`) à chaque changement de filtre.
 
 #### Scenario: Bouton Aujourd'hui
 - **WHEN** l'utilisateur clique "Aujourd'hui" depuis un autre jour
 - **THEN** la date courante repasse à aujourd'hui, la liste se recharge, le bouton prend la classe `is-today`
 
-#### Scenario: Date picker — snap vers date disponible
-- **WHEN** l'utilisateur sélectionne une date sans événements dans le picker
-- **THEN** la date est automatiquement snappée vers la date disponible la plus proche (future en priorité, sinon la dernière disponible)
+#### Scenario: Dates scopées aux filtres
+- **WHEN** l'utilisateur sélectionne la ville "Bouaye" et soumet le formulaire
+- **THEN** le calendrier flatpickr ne montre activées que les dates où des événements existent à Bouaye
+
+#### Scenario: Classe has-events
+- **WHEN** flatpickr affiche le calendrier
+- **THEN** les jours présents dans `state.availableDates` ont la classe `.has-events` et s'affichent en jaune gras ; les autres sont grisés
 
 ---
 
 ### Requirement: Formulaire de recherche comme filtre du jour
-La PWA SHALL afficher un formulaire de recherche permettant d'affiner l'affichage dans la vue du jour sélectionné. Le formulaire contient : sélecteur de catégorie (toutes les catégories La Grue + option "Toutes"), dropdown ville peuplé dynamiquement depuis `GET /api/cities`. La soumission SHALL déclencher un appel `GET /api/events?date=<jour courant>&category=...&city=...`.
+La PWA SHALL afficher un formulaire de recherche permettant d'affiner l'affichage dans la vue du jour sélectionné. Le formulaire contient : sélecteur de catégorie (toutes les catégories + option "Toutes (N)"), dropdown ville peuplé depuis `GET /api/cities`. Chaque option SHALL afficher son count entre parenthèses `Label (N)` et être désactivée (`disabled`) si N=0. Les counts de catégorie viennent de `GET /api/categories/counts` (total toutes villes, rechargé au chargement uniquement). La sélection d'une catégorie SHALL mettre à jour en live les compteurs du dropdown ville via `GET /api/cities/counts?category=`. La soumission SHALL déclencher un appel `GET /api/events?date=<jour courant>&category=...&city=...`.
+
+#### Scenario: Compteurs catégories
+- **WHEN** la page charge
+- **THEN** chaque option du dropdown catégorie affiche `Label (N)` avec N = total événements à venir toutes villes ; les catégories à 0 sont disabled
+
+#### Scenario: Compteurs villes filtrées par catégorie
+- **WHEN** l'utilisateur sélectionne "Concerts / musique"
+- **THEN** le dropdown ville met à jour ses compteurs pour n'afficher que les counts pour cette catégorie ; les villes à 0 sont disabled
 
 #### Scenario: Filtrage par catégorie dans le jour affiché
 - **WHEN** l'utilisateur sélectionne "Concerts / musique" et valide
@@ -46,6 +58,19 @@ La PWA SHALL afficher un formulaire de recherche permettant d'affiner l'affichag
 #### Scenario: Réinitialisation des filtres
 - **WHEN** l'utilisateur clique sur "Réinitialiser"
 - **THEN** les filtres catégorie et ville sont effacés et la liste du jour courant est rechargée sans filtre
+
+---
+
+### Requirement: Compteur de résultats dans le formulaire
+La PWA SHALL afficher un compteur de résultats (`<p id="results-count">`) à l'intérieur du formulaire de recherche, sous les boutons. Il affiche : nombre de résultats pour le jour sélectionné, suivi du total à venir sur les N prochains jours (via `GET /api/stats?category=&city=`). Le format est `"X résultat(s) [aujourd'hui / le <date>] · Y sur les Z prochains jours"`. Si total = 0, affiche `"Aucun résultat [aujourd'hui / le <date>]"`.
+
+#### Scenario: Compteur avec résultats
+- **WHEN** la liste charge avec 5 événements aujourd'hui et 42 sur les 14 prochains jours
+- **THEN** le compteur affiche "5 résultats aujourd'hui · 42 sur les 14 prochains jours"
+
+#### Scenario: Compteur sans résultat
+- **WHEN** aucun événement ne correspond aux filtres pour la date sélectionnée
+- **THEN** le compteur affiche "Aucun résultat aujourd'hui" (ou "le <date>")
 
 ---
 
@@ -100,7 +125,7 @@ La PWA SHALL afficher une fiche détail en panneau latéral ou modal lors du cli
 
 #### Scenario: Lien source toujours visible
 - **WHEN** la fiche détail est ouverte
-- **THEN** le lien "Voir la source ↗" est affiché si `detail_url` est non null
+- **THEN** le bouton "Voir la source ↗" est toujours rendu : lien `<a>` actif si `detail_url` est non null, `<span aria-disabled="true">` grisé et non cliquable sinon
 
 ---
 

@@ -64,4 +64,20 @@ describe('scrapePaysLoire', () => {
     const events = await scrapePaysLoire();
     expect(events).toHaveLength(0);
   });
+
+  it('skips events with empty keywords_fr (null category)', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValue({
+      data: { results: [{ ...mockRecord, keywords_fr: '' }], total_count: 1 },
+    });
+    const events = await scrapePaysLoire();
+    expect(events).toHaveLength(0);
+  });
+
+  it('skips events with unrecognised keywords (null category)', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValue({
+      data: { results: [{ ...mockRecord, keywords_fr: 'jardinage;botanique' }], total_count: 1 },
+    });
+    const events = await scrapePaysLoire();
+    expect(events).toHaveLength(0);
+  });
 });

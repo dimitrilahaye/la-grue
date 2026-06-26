@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { scrapeNantesMetropole } from '../nantesMetropole';
+import { scrapeNantesMetropole, toNantesSlug } from '../nantesMetropole';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -49,9 +49,22 @@ describe('scrapeNantesMetropole', () => {
     expect(events[0].externalId).toBe('EVT-001');
   });
 
-  it('sets detailUrl from lien_agenda', async () => {
+  it('generates detailUrl from title slug', async () => {
     const events = await scrapeNantesMetropole();
-    expect(events[0].detailUrl).toBe('https://pannonica.com/jazz');
+    expect(events[0].detailUrl).toBe(
+      'https://metropole.nantes.fr/que-faire-a-nantes/agenda/concert-de-jazz-au-pannonica'
+    );
+  });
+
+  it('skips events with unrecognised category (null)', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValue({
+      data: {
+        results: [{ ...mockRecord, types_libelles: 'Inconnu', themes_libelles: '' }],
+        total_count: 1,
+      },
+    });
+    const events = await scrapeNantesMetropole();
+    expect(events).toHaveLength(0);
   });
 
   it('skips records without id_manif', async () => {
@@ -60,5 +73,21 @@ describe('scrapeNantesMetropole', () => {
     });
     const events = await scrapeNantesMetropole();
     expect(events).toHaveLength(0);
+  });
+});
+
+describe('toNantesSlug', () => {
+  it('lowercases and replaces spaces with hyphens', () => {
+    expect(toNantesSlug('Festival CinéPride 2026')).toBe('festival-cinepride-2026');
+  });
+
+  it('removes apostrophes and handles accents', () => {
+    expect(toNantesSlug("Stage d'été aviron 2026")).toBe('stage-dete-aviron-2026');
+  });
+
+  it('handles ponctuation and accents', () => {
+    expect(toNantesSlug('Concert : Fauré and Saint-Saëns à la cathédrale de Nantes')).toBe(
+      'concert-faure-and-saint-saens-a-la-cathedrale-de-nantes'
+    );
   });
 });

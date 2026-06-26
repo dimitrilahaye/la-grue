@@ -67,6 +67,96 @@ describe('GET /api/events', () => {
     const res = await request(app).get('/api/events?limit=abc');
     expect(res.status).toBe(400);
   });
+
+  it('returns 400 for category=autres', async () => {
+    const res = await request(app).get('/api/events?category=autres');
+    expect(res.status).toBe(400);
+  });
+});
+
+describe('GET /api/dates', () => {
+  beforeEach(() => {
+    (eventsQueries.findEventDates as jest.Mock).mockResolvedValue(['2026-06-25', '2026-06-28']);
+  });
+
+  it('returns 200 with available dates', async () => {
+    const res = await request(app).get('/api/dates');
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual(['2026-06-25', '2026-06-28']);
+  });
+
+  it('passes city filter to findEventDates', async () => {
+    const res = await request(app).get('/api/dates?city=Bouaye');
+    expect(res.status).toBe(200);
+    expect(eventsQueries.findEventDates).toHaveBeenCalledWith(
+      expect.objectContaining({ city: 'Bouaye' })
+    );
+  });
+
+  it('passes category filter to findEventDates', async () => {
+    const res = await request(app).get('/api/dates?category=concerts-musique');
+    expect(res.status).toBe(200);
+    expect(eventsQueries.findEventDates).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'concerts-musique' })
+    );
+  });
+});
+
+describe('GET /api/stats', () => {
+  beforeEach(() => {
+    (eventsQueries.getUpcomingStats as jest.Mock).mockResolvedValue({ total: 42, daysCount: 7 });
+  });
+
+  it('returns total and daysCount without filters', async () => {
+    const res = await request(app).get('/api/stats');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ total: 42, daysCount: 7 });
+  });
+
+  it('passes category and city filters to getUpcomingStats', async () => {
+    const res = await request(app).get('/api/stats?category=festivals&city=Nantes');
+    expect(res.status).toBe(200);
+    expect(eventsQueries.getUpcomingStats).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'festivals', city: 'Nantes' })
+    );
+  });
+});
+
+describe('GET /api/categories/counts', () => {
+  it('returns counts by category', async () => {
+    (eventsQueries.getCategoryCounts as jest.Mock).mockResolvedValue({
+      'concerts-musique': 12,
+      'festivals': 5,
+    });
+    const res = await request(app).get('/api/categories/counts');
+    expect(res.status).toBe(200);
+    expect(res.body['concerts-musique']).toBe(12);
+    expect(res.body['festivals']).toBe(5);
+  });
+});
+
+describe('GET /api/cities/counts', () => {
+  beforeEach(() => {
+    (eventsQueries.getCityCounts as jest.Mock).mockResolvedValue({
+      'Nantes': 100,
+      'Bouaye': 2,
+    });
+  });
+
+  it('returns counts by city', async () => {
+    const res = await request(app).get('/api/cities/counts');
+    expect(res.status).toBe(200);
+    expect(res.body['Nantes']).toBe(100);
+    expect(res.body['Bouaye']).toBe(2);
+  });
+
+  it('passes category filter to getCityCounts', async () => {
+    const res = await request(app).get('/api/cities/counts?category=concerts-musique');
+    expect(res.status).toBe(200);
+    expect(eventsQueries.getCityCounts).toHaveBeenCalledWith(
+      expect.objectContaining({ category: 'concerts-musique' })
+    );
+  });
 });
 
 describe('GET /api/events/:id', () => {

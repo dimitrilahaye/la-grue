@@ -144,4 +144,13 @@ describe('scrapeWik', () => {
     const events = await scrapeWik();
     expect(events).toHaveLength(2);
   });
+
+  it('skips article with unmapped category path (e.g. loisir)', async () => {
+    mockedAxios.get = jest.fn()
+      .mockResolvedValueOnce({ data: listing(makeArticle({ href: '/nantes/1/loisir/sortie' })) })
+      .mockResolvedValue({ data: emptyListing });
+
+    const events = await scrapeWik();
+    expect(events).toHaveLength(0);
+  });
 });

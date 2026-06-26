@@ -7,7 +7,7 @@ Agrégation nocturne des événements nantais depuis plusieurs sources hétérog
 ## Requirements
 
 ### Requirement: Ingestion Nantes Métropole API
-Le système SHALL interroger l'API OpenDataSoft Nantes Métropole (`https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records`) pour récupérer les événements de la semaine en cours et de la semaine suivante. Les champs `id_manif`, `nom`, `date`, `heure_debut`, `heure_fin`, `lieu`, `adresse`, `ville`, `themes_libelles`, `types_libelles`, `lien_agenda`, `media_url`, `gratuit` et `precisions_tarifs_evt` SHALL être mappés vers le schéma unifié Event.
+Le système SHALL interroger l'API OpenDataSoft Nantes Métropole (`https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records`) pour récupérer les événements de la semaine en cours et de la semaine suivante. Les champs `id_manif`, `nom`, `date`, `heure_debut`, `heure_fin`, `lieu`, `adresse`, `ville`, `themes_libelles`, `types_libelles`, `media_url`, `gratuit` et `precisions_tarifs_evt` SHALL être mappés vers le schéma unifié Event. Le `detailUrl` SHALL être généré depuis le champ `nom` via une fonction de slug (`toNantesSlug`) : lowercase → NFD → suppression diacritiques → suppression non-alphanumériques (hors espace et tiret) → trim → remplacement espaces/tirets par tiret unique, préfixé par `https://metropole.nantes.fr/que-faire-a-nantes/agenda/`. Le champ `lien_agenda` (URL `infonantes` dépréciée) n'est plus utilisé pour le `detailUrl`.
 
 #### Scenario: Récupération réussie
 - **WHEN** le job appelle l'API Nantes Métropole avec un filtre de date sur les 14 prochains jours
@@ -60,7 +60,7 @@ Le système SHALL scraper `https://www.wik-nantes.fr/agenda?date=DD/MM/YYYY` (da
 ---
 
 ### Requirement: Normalisation vers le schéma unifié
-Le système SHALL transformer les données de chaque source vers un objet `NormalizedEvent` commun avant persistence. La catégorie normalisée SHALL être l'une des valeurs : `bars-soirees`, `concerts-musique`, `expositions-arts`, `spectacles-theatre`, `festivals`, `ginguettes-guinguettes`, `sexpo`. Si aucune catégorie source ne correspond, la valeur `autres` PEUT être utilisée.
+Le système SHALL transformer les données de chaque source vers un objet `NormalizedEvent` commun avant persistence. La catégorie normalisée SHALL être l'une des valeurs : `bars-soirees`, `concerts-musique`, `expositions-arts`, `spectacles-theatre`, `festivals`, `ginguettes-guinguettes`, `sexpo`. Les fonctions de mapping (`mapNantesMetropoleCategory`, `mapPaysLoireCategory`, `mapWikCategory`) SHALL retourner `Category | null` — jamais `'autres'`. Les scrapers SHALL ignorer tout événement dont le mapping retourne `null` : aucun événement sans catégorie reconnue n'est persisté.
 
 #### Scenario: Catégorie mappée
 - **WHEN** la catégorie brute source correspond à une règle de mapping connue
@@ -68,7 +68,7 @@ Le système SHALL transformer les données de chaque source vers un objet `Norma
 
 #### Scenario: Catégorie inconnue
 - **WHEN** la catégorie brute ne correspond à aucune règle de mapping
-- **THEN** la catégorie normalisée est `autres` et la catégorie brute est conservée dans `raw_category`
+- **THEN** le mapping retourne `null` et l'événement est ignoré (non inséré en base)
 
 ---
 

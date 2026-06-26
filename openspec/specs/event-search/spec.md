@@ -37,6 +37,10 @@ Le système SHALL exposer `GET /api/events` acceptant les query parameters suiva
 - **WHEN** un paramètre de type incorrect est fourni (ex: `limit=abc`, `date=not-a-date`)
 - **THEN** la réponse est HTTP 400 avec un message d'erreur explicite
 
+#### Scenario: Catégorie supprimée
+- **WHEN** `GET /api/events?category=autres` est appelé
+- **THEN** HTTP 400 est retourné avec un message listant les catégories valides
+
 #### Scenario: Aucun résultat
 - **WHEN** aucun événement ne correspond aux filtres
 - **THEN** la réponse est HTTP 200 avec `{ data: [], total: 0, limit, offset, date }`
@@ -66,6 +70,63 @@ Le paramètre `date` est le pivot de navigation. En son absence, le serveur SHAL
 #### Scenario: Navigation vers un jour passé
 - **WHEN** `GET /api/events?date=2026-07-13` est appelé alors qu'on est le 14
 - **THEN** les événements du 13 juillet sont retournés normalement (pas de restriction sur les jours passés)
+
+---
+
+### Requirement: Endpoint de dates disponibles avec filtres
+`GET /api/dates` SHALL retourner la liste des dates (format `YYYY-MM-DD`) pour lesquelles il existe au moins un événement. Les query parameters optionnels `category` et `city` filtrent les dates retournées. Sans paramètres, toutes les dates avec événements sont retournées.
+
+#### Scenario: Dates filtrées par ville
+- **WHEN** `GET /api/dates?city=Bouaye` est appelé
+- **THEN** seules les dates avec au moins un événement à Bouaye sont retournées
+
+#### Scenario: Dates filtrées par catégorie
+- **WHEN** `GET /api/dates?category=concerts-musique` est appelé
+- **THEN** seules les dates avec au moins un concert sont retournées
+
+---
+
+### Requirement: Endpoint de statistiques à venir
+Le système SHALL exposer `GET /api/stats` retournant `{ total: number, daysCount: number }` représentant le nombre total d'événements à venir (>= aujourd'hui Europe/Paris) et le nombre de jours distincts couverts. Les query parameters optionnels `category` et `city` filtrent les résultats.
+
+#### Scenario: Stats globales
+- **WHEN** `GET /api/stats` est appelé sans paramètres
+- **THEN** `{ total: N, daysCount: M }` est retourné avec N = nombre d'événements à venir et M = jours distincts
+
+#### Scenario: Stats filtrées
+- **WHEN** `GET /api/stats?city=Nantes&category=festivals` est appelé
+- **THEN** `total` et `daysCount` ne comptent que les festivals à Nantes à venir
+
+---
+
+### Requirement: Endpoint de comptage par catégorie
+Le système SHALL exposer `GET /api/categories/counts` retournant un objet `{ [category]: number }` avec le nombre d'événements à venir par catégorie, toutes villes confondues. Aucun filtre n'est accepté — les counts sont globaux.
+
+#### Scenario: Comptage par catégorie
+- **WHEN** `GET /api/categories/counts` est appelé
+- **THEN** un objet avec une clé par catégorie présente en base et son count est retourné
+
+---
+
+### Requirement: Endpoint de comptage par ville
+Le système SHALL exposer `GET /api/cities/counts` retournant un objet `{ [city]: number }` avec le nombre d'événements à venir par ville (clé en `initcap(lower(city))`). Le query parameter optionnel `category` filtre les événements comptés.
+
+#### Scenario: Comptage par ville sans filtre
+- **WHEN** `GET /api/cities/counts` est appelé sans paramètre
+- **THEN** le count total à venir par ville est retourné, sans doublons de casse ("Nantes" fusionne "NANTES" + "Nantes")
+
+#### Scenario: Comptage par ville filtré par catégorie
+- **WHEN** `GET /api/cities/counts?category=concerts-musique` est appelé
+- **THEN** seuls les concerts à venir sont comptés par ville
+
+---
+
+### Requirement: Déduplication des villes par casse
+`GET /api/cities` SHALL retourner les villes déduplicées par `lower(city)`, avec affichage en `initcap()`. "NANTES" et "Nantes" en base donnent une seule entrée "Nantes".
+
+#### Scenario: Déduplication casse
+- **WHEN** la base contient des variantes de casse pour une même ville
+- **THEN** `GET /api/cities` retourne une seule entrée en initcap
 
 ---
 
