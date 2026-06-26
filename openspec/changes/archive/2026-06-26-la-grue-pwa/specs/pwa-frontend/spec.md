@@ -86,15 +86,19 @@ La PWA SHALL afficher une fiche détail en panneau latéral ou modal lors du cli
 ---
 
 ### Requirement: iFrame opt-in avec fallback
-La fiche détail SHALL proposer un bouton "Aperçu de la page source" qui charge l'URL `detail_url` dans un iFrame. Si l'iFrame ne déclenche pas l'événement `load` dans les 4 secondes, ou si l'accès à `contentDocument` lève une exception, un message de fallback SHALL s'afficher avec un lien "Ouvrir dans un nouvel onglet ↗".
+La fiche détail SHALL proposer un bouton "Aperçu de la page source" qui charge l'URL `detail_url` dans un iFrame. Le fallback SHALL s'afficher dans deux cas : (1) `onload` ne se déclenche pas dans les 4 secondes, ou (2) `onload` se déclenche mais `contentDocument.body` est vide (page bloquée par CSP `frame-ancestors` — le navigateur charge une page blanche same-origin). Si l'accès à `contentDocument` lève une `SecurityError` (cross-origin), la page s'est chargée avec succès. Le fallback affiche un lien "Ouvrir dans un nouvel onglet ↗".
 
 #### Scenario: iFrame chargé avec succès
-- **WHEN** l'utilisateur clique "Aperçu" et l'iFrame se charge dans les 4s
-- **THEN** le contenu de la page source est visible dans l'iFrame, l'overlay de chargement disparaît
+- **WHEN** l'utilisateur clique "Aperçu" et l'iFrame se charge dans les 4s avec du contenu cross-origin
+- **THEN** l'accès à `contentDocument` lève une `SecurityError`, l'overlay disparaît, le contenu est visible
 
-#### Scenario: iFrame bloqué par X-Frame-Options
-- **WHEN** le site source bloque l'intégration iFrame et `onload` ne se déclenche pas dans les 4s
-- **THEN** le message "Ce site ne peut pas être affiché ici. [Ouvrir dans un nouvel onglet ↗]" s'affiche
+#### Scenario: iFrame bloqué par CSP frame-ancestors
+- **WHEN** le site source bloque l'intégration via `Content-Security-Policy: frame-ancestors`, `onload` se déclenche mais la page est vide
+- **THEN** `contentDocument.body.innerHTML` est vide, le fallback s'affiche immédiatement sans attendre le timeout
+
+#### Scenario: iFrame bloqué — onload ne se déclenche pas
+- **WHEN** le site source bloque l'intégration via `X-Frame-Options` et `onload` ne se déclenche pas
+- **THEN** après 4 secondes, le fallback s'affiche avec le lien "Ouvrir dans un nouvel onglet ↗"
 
 #### Scenario: Fermeture de l'iFrame
 - **WHEN** l'utilisateur clique sur le bouton "Fermer l'aperçu"
