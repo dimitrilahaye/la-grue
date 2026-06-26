@@ -303,6 +303,9 @@ function openDetail(id) {
       actionsHtml += `<a href="${escapeHtml(event.detailUrl)}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">Voir la source &#8599;</a>`;
       actionsHtml += `<button class="btn btn-outline btn-sm" id="open-iframe-btn" data-url="${escapeHtml(event.detailUrl)}">Aperçu</button>`;
     }
+    if (navigator.share) {
+      actionsHtml += `<button class="btn btn-outline btn-sm" id="share-btn">Partager</button>`;
+    }
     actionsEl.innerHTML = actionsHtml;
 
     if (event.detailUrl) {
@@ -310,6 +313,10 @@ function openDetail(id) {
         loadIframe(event.detailUrl);
       });
     }
+
+    document.getElementById('share-btn')?.addEventListener('click', () => {
+      shareEvent(event);
+    });
 
     // Show overlay
     const overlay = document.getElementById('detail-overlay');
@@ -319,6 +326,20 @@ function openDetail(id) {
   }).catch(() => {
     // Silently fail — the card click shouldn't crash the UI
   });
+}
+
+async function shareEvent(event) {
+  const venue = event.venueName ? ` @ ${event.venueName}` : '';
+  const date = formatDateTime(event.startAt);
+  try {
+    await navigator.share({
+      title: event.title,
+      text: `${event.title}\n${date}${venue}`,
+      url: event.detailUrl || window.location.href,
+    });
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('Share failed:', err);
+  }
 }
 
 function closeDetail() {
