@@ -378,10 +378,10 @@ a { color: var(--color-accent-dark); }
 
 .card-share-btn {
   position: absolute;
-  top: 0;
+  bottom: var(--space-sm);
   right: var(--space-sm);
   padding: 0 var(--space-sm);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  border-radius: var(--radius-sm);
 }
 .event-card { position: relative; }
 
