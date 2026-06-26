@@ -376,6 +376,28 @@ a { color: var(--color-accent-dark); }
 }
 .card-time { font-variant-numeric: tabular-nums; }
 
+.card-share-btn {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.event-card { position: relative; }
+.event-card:hover .card-share-btn,
+.event-card:focus-within .card-share-btn { opacity: 1; }
+
 /* === Load more ============================================================ */
 .load-more-wrap {
   display: flex;

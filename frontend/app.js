@@ -142,6 +142,10 @@ function renderCard(event) {
 
   const time = formatTime(event.startAt);
 
+  const shareHtml = navigator.share
+    ? `<button class="card-share-btn" aria-label="Partager">&#8679;</button>`
+    : '';
+
   article.innerHTML = `
     ${imageHtml}
     <div class="card-body">
@@ -155,10 +159,16 @@ function renderCard(event) {
         ${event.venueName ? `<span>&#128205; ${escapeHtml(event.venueName)}${event.city ? ` · ${escapeHtml(event.city)}` : ''}</span>` : ''}
       </div>
     </div>
+    ${shareHtml}
   `;
 
   article.addEventListener('click', () => openDetail(event.id));
   article.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') openDetail(event.id); });
+
+  article.querySelector('.card-share-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    shareEvent(event);
+  });
 
   return article;
 }
