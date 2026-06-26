@@ -14,7 +14,8 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: isDev ? 0 : 120,
+  max: 120,
+  skip: () => isDev,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later.' },
@@ -23,7 +24,8 @@ const apiLimiter = rateLimit({
 // Strict limiter for the internal endpoint — Render Cron calls it once per night
 const internalLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
-  max: isDev ? 0 : 10,
+  max: 10,
+  skip: () => isDev,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: { error: 'Too many requests.' },
