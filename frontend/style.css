@@ -391,12 +391,8 @@ a { color: var(--color-accent-dark); }
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: opacity var(--transition);
 }
 .event-card { position: relative; }
-.event-card:hover .card-share-btn,
-.event-card:focus-within .card-share-btn { opacity: 1; }
 
 /* === Load more ============================================================ */
 .load-more-wrap {
