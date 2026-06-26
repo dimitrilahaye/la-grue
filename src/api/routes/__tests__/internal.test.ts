@@ -5,7 +5,8 @@ jest.mock('../../../job', () => ({
   runJob: jest.fn().mockResolvedValue([]),
 }));
 
-const CRON_SECRET = process.env.CRON_SECRET!;
+const CRON_SECRET = 'test-secret-ci';
+process.env.CRON_SECRET = CRON_SECRET;
 
 const app = createApp();
 
