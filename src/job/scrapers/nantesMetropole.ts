@@ -89,7 +89,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
         category,
         rawCategory: rawCategory || null,
         tags: [],
-        detailUrl: r.lien_agenda ?? r.url_site ?? null,
+        detailUrl: (r.lien_agenda && r.lien_agenda !== 'https://metropole.nantes.fr/que-faire-a-nantes/agenda' ? r.lien_agenda : null) ?? r.url_site ?? null,
         imageUrl: r.media_url ?? null,
         isFree: r.gratuit ?? null,
         priceInfo: r.precisions_tarifs_evt ?? null,
