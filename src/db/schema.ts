@@ -5,7 +5,6 @@ import {
   timestamp,
   boolean,
   doublePrecision,
-  unique,
   index,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
@@ -14,6 +13,7 @@ export const events = pgTable(
   'events',
   {
     id: uuid('id').defaultRandom().primaryKey(),
+    canonicalId: text('canonical_id').notNull().unique(),
     source: text('source').notNull(),
     externalId: text('external_id').notNull(),
     title: text('title').notNull(),
@@ -36,7 +36,6 @@ export const events = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    unique('events_source_external_id_unique').on(table.source, table.externalId),
     index('events_start_at_idx').on(table.startAt),
     index('events_category_idx').on(table.category),
     index('events_city_lower_idx').on(sql`lower(${table.city})`),

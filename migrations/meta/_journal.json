@@ -15,6 +15,20 @@
       "when": 1782461322869,
       "tag": "0001_remove_autres_category",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782602537655,
+      "tag": "0002_wise_violations",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782603302387,
+      "tag": "0003_drop_source_externalid_unique",
+      "breakpoints": true
     }
   ]
 }
