@@ -49,15 +49,7 @@ describe('scrapeNantesMetropole', () => {
     expect(events[0].externalId).toBe('EVT-001');
   });
 
-  it('uses lien_agenda as detailUrl when present', async () => {
-    const events = await scrapeNantesMetropole();
-    expect(events[0].detailUrl).toBe('https://pannonica.com/jazz');
-  });
-
-  it('falls back to title slug when lien_agenda is null', async () => {
-    mockedAxios.get = jest.fn().mockResolvedValue({
-      data: { results: [{ ...mockRecord, lien_agenda: null }], total_count: 1 },
-    });
+  it('builds detailUrl from title slug', async () => {
     const events = await scrapeNantesMetropole();
     expect(events[0].detailUrl).toBe(
       'https://metropole.nantes.fr/que-faire-a-nantes/agenda/concert-de-jazz-au-pannonica'

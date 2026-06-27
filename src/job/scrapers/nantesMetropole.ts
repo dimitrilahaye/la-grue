@@ -108,7 +108,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
         category,
         rawCategory: rawCategory || null,
         tags: [],
-        detailUrl: r.lien_agenda ?? `${AGENDA_BASE}/${toNantesSlug(r.nom)}`,
+        detailUrl: `${AGENDA_BASE}/${toNantesSlug(r.nom)}`,
         imageUrl: r.media_url ?? null,
         isFree: r.gratuit ?? null,
         priceInfo: r.precisions_tarifs_evt ?? null,
