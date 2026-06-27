@@ -140,6 +140,32 @@ async function fetchPage(page: number, dateParam: string): Promise<NormalizedEve
   return events;
 }
 
+async function fetchMetaDescription(url: string): Promise<string | null> {
+  try {
+    const res = await axios.get<string>(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const match = res.data.match(/<meta name="description" content="([^"]+)"/i);
+    return match ? match[1].replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, "'").trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function enrichDescriptions(events: NormalizedEvent[]): Promise<void> {
+  const BATCH = 5;
+  for (let i = 0; i < events.length; i += BATCH) {
+    const batch = events.slice(i, i + BATCH);
+    await Promise.allSettled(
+      batch.map(async (e) => {
+        if (!e.detailUrl) return;
+        e.description = await fetchMetaDescription(e.detailUrl);
+      }),
+    );
+  }
+}
+
 export async function scrapeWik(): Promise<NormalizedEvent[]> {
   const allEvents: NormalizedEvent[] = [];
   const dateParam = todayFr();
@@ -156,6 +182,8 @@ export async function scrapeWik(): Promise<NormalizedEvent[]> {
     }
   }
 
+  console.log(`[WIK] Enriching descriptions for ${allEvents.length} events...`);
+  await enrichDescriptions(allEvents);
   console.log(`[WIK] Total: ${allEvents.length} events`);
   return allEvents;
 }

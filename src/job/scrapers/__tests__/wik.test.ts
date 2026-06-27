@@ -75,7 +75,8 @@ describe('scrapeWik', () => {
 
     await scrapeWik();
 
-    expect(mockedAxios.get).toHaveBeenCalledTimes(2);
+    // page 0 (1 event) + page 1 (empty, stops) + 1 enrichment GET
+    expect(mockedAxios.get).toHaveBeenCalledTimes(3);
   });
 
   it('skips article with empty title', async () => {
@@ -124,6 +125,28 @@ describe('scrapeWik', () => {
 
     const events = await scrapeWik();
     expect(events).toHaveLength(0);
+  });
+
+  it('enriches description from meta tag on detail page', async () => {
+    const detailHtml = `<html><head><meta name="description" content="Un concert de jazz intime." /></head></html>`;
+    mockedAxios.get = jest.fn()
+      .mockResolvedValueOnce({ data: listing(makeArticle()) }) // listing page 0
+      .mockResolvedValueOnce({ data: emptyListing })           // listing page 1 (stops)
+      .mockResolvedValueOnce({ data: detailHtml });            // enrichment GET
+
+    const events = await scrapeWik();
+    expect(events[0].description).toBe('Un concert de jazz intime.');
+  });
+
+  it('keeps description null when detail page is inaccessible', async () => {
+    mockedAxios.get = jest.fn()
+      .mockResolvedValueOnce({ data: listing(makeArticle()) })
+      .mockResolvedValueOnce({ data: emptyListing })
+      .mockRejectedValueOnce(new Error('timeout'));
+
+    const events = await scrapeWik();
+    expect(events[0].description).toBeNull();
+    expect(events).toHaveLength(1);
   });
 
   it('derives category from URL path', async () => {
