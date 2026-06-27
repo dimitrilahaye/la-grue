@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { type NormalizedEvent } from '../../types/event';
-import { mapNantesMetropoleCategory } from '../normalizer';
+import { mapNantesMetropoleCategory, toCanonicalId } from '../normalizer';
 
 const API_URL =
   'https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records';
@@ -96,6 +96,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
       events.push({
         source: 'nantes_metropole',
         externalId: r.id_manif,
+        canonicalId: toCanonicalId(r.nom, startAt, r.ville ?? 'Nantes'),
         title: r.nom,
         description: r.description_evt ?? r.description ?? null,
         startAt,

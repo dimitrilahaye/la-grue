@@ -1,4 +1,13 @@
+import { createHash } from 'crypto';
+import he from 'he';
 import { type Category, CATEGORIES } from '../types/event';
+
+export function decodeText(s: string): string;
+export function decodeText(s: string | null | undefined): string | null;
+export function decodeText(s: string | null | undefined): string | null {
+  if (s == null) return null;
+  return he.decode(s);
+}
 
 const NANTES_METROPOLE_MAP: Record<string, Category> = {
   // Specific keys first (avoid partial matches like "expo" matching "sexpo")
@@ -164,4 +173,11 @@ export function mapBigCityCategory(labels: string[]): Category | null {
 
 export function isValidCategory(cat: string): cat is Category {
   return (CATEGORIES as readonly string[]).includes(cat);
+}
+
+export function toCanonicalId(title: string, startAt: Date, city: string | null): string {
+  const normalizedTitle = normalizeString(title).replace(/\s+/g, ' ').trim();
+  const datePart = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris' }).format(startAt);
+  const cityPart = (city ?? 'nantes').toLowerCase();
+  return createHash('sha256').update(`${normalizedTitle}|${datePart}|${cityPart}`).digest('hex');
 }

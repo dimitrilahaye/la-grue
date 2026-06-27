@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createHash } from 'crypto';
 import { type NormalizedEvent } from '../../types/event';
-import { mapPullRougeCategory } from '../normalizer';
+import { mapPullRougeCategory, toCanonicalId } from '../normalizer';
 
 const URL = 'https://pullrouge.fr/';
 const USER_AGENT = 'LaGrue-Bot/1.0 (https://github.com/dimitrilahaye/la-grue)';
@@ -133,6 +133,7 @@ export async function scrapePullRouge(): Promise<NormalizedEvent[]> {
       events.push({
         source: 'pull_rouge',
         externalId: externalId(title, startAt),
+        canonicalId: toCanonicalId(title, startAt, venue ? cityFromVenue(venue) : 'Nantes'),
         title,
         description: null,
         startAt,

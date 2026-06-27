@@ -3,7 +3,7 @@ import * as cheerio from 'cheerio';
 import type { AnyNode } from 'domhandler';
 import { createHash } from 'crypto';
 import { type NormalizedEvent } from '../../types/event';
-import { mapWikCategory } from '../normalizer';
+import { mapWikCategory, toCanonicalId } from '../normalizer';
 
 const BASE_URL = 'https://www.wik-nantes.fr';
 const AGENDA_URL = `${BASE_URL}/agenda`;
@@ -92,6 +92,7 @@ function parseArticle($: cheerio.CheerioAPI, el: AnyNode): NormalizedEvent | nul
   return {
     source: 'wik',
     externalId: externalIdFromWik(title, startAt),
+    canonicalId: toCanonicalId(title, startAt, 'Nantes'),
     title,
     description: null,
     startAt,

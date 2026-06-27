@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { type NormalizedEvent } from '../../types/event';
-import { mapPaysLoireCategory } from '../normalizer';
+import { mapPaysLoireCategory, toCanonicalId } from '../normalizer';
 
 const API_URL =
   'https://data.paysdelaloire.fr/api/explore/v2.1/catalog/datasets/agenda-culture-de-la-region-des-pays-de-la-loire/records';
@@ -82,6 +82,7 @@ export async function scrapePaysLoire(): Promise<NormalizedEvent[]> {
       events.push({
         source: 'pays_de_loire',
         externalId: r.slug,
+        canonicalId: toCanonicalId(r.title_fr, startAt, r.location_city ?? null),
         title: r.title_fr,
         description: r.description_fr ?? null,
         startAt,

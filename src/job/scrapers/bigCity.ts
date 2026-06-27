@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { type NormalizedEvent } from '../../types/event';
-import { mapBigCityCategory } from '../normalizer';
+import { mapBigCityCategory, toCanonicalId } from '../normalizer';
 
 const LISTING_URL = 'https://www.bigcitynantes.fr/que-faire-a-nantes/';
 const AJAX_URL = 'https://www.bigcitynantes.fr/wp-admin/admin-ajax.php';
@@ -143,6 +143,7 @@ export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
       events.push({
         source: 'big_city',
         externalId: String(e.id),
+        canonicalId: toCanonicalId(e.title, startAt, 'Nantes'),
         title: e.title,
         description: null,
         startAt,

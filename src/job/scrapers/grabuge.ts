@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { type NormalizedEvent } from '../../types/event';
-import { mapGrabugeCategory } from '../normalizer';
+import { mapGrabugeCategory, toCanonicalId } from '../normalizer';
 
 function stripHtml(html: string): string {
   return cheerio.load(html).text().replace(/\s+/g, ' ').trim();
@@ -104,6 +104,7 @@ export async function scrapeGrabuge(): Promise<NormalizedEvent[]> {
       events.push({
         source: 'grabuge',
         externalId: String(e.id),
+        canonicalId: toCanonicalId(e.title, startAt, e.venue?.city ?? 'Nantes'),
         title: e.title,
         description: e.description ? stripHtml(e.description) : null,
         startAt,
