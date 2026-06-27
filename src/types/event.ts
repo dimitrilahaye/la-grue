@@ -21,7 +21,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
 };
 
 export interface NormalizedEvent {
-  source: 'nantes_metropole' | 'pays_de_loire' | 'wik';
+  source: 'nantes_metropole' | 'pays_de_loire' | 'wik' | 'grabuge' | 'pull_rouge' | 'big_city';
   externalId: string;
   title: string;
   description: string | null;

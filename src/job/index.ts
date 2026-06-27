@@ -1,6 +1,9 @@
 import { scrapeNantesMetropole } from './scrapers/nantesMetropole';
 import { scrapePaysLoire } from './scrapers/paysLoire';
 import { scrapeWik } from './scrapers/wik';
+import { scrapeGrabuge } from './scrapers/grabuge';
+import { scrapePullRouge } from './scrapers/pullRouge';
+import { scrapeBigCity } from './scrapers/bigCity';
 import { upsertEvents } from './deduplicator';
 
 export interface JobSummary {
@@ -19,6 +22,9 @@ export async function runJob(): Promise<JobSummary[]> {
     scrapeNantesMetropole().then((events) => ({ source: 'nantes_metropole', events })),
     scrapePaysLoire().then((events) => ({ source: 'pays_de_loire', events })),
     scrapeWik().then((events) => ({ source: 'wik', events })),
+    scrapeGrabuge().then((events) => ({ source: 'grabuge', events })),
+    scrapePullRouge().then((events) => ({ source: 'pull_rouge', events })),
+    scrapeBigCity().then((events) => ({ source: 'big_city', events })),
   ]);
 
   const summaries: JobSummary[] = [];

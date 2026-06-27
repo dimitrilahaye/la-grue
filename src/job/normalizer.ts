@@ -32,6 +32,53 @@ const PAYS_LOIRE_KEYWORDS_MAP: Record<string, Category> = {
   'bal': 'ginguettes-guinguettes',
 };
 
+const GRABUGE_CATEGORY_MAP: Record<string, Category> = {
+  'sexpo': 'sexpo',
+  'concert': 'concerts-musique',
+  'musique': 'concerts-musique',
+  'jazz': 'concerts-musique',
+  'rock': 'concerts-musique',
+  'electro': 'concerts-musique',
+  'exposition': 'expositions-arts',
+  'expo': 'expositions-arts',
+  'spectacle': 'spectacles-theatre',
+  'theatre': 'spectacles-theatre',
+  'théâtre': 'spectacles-theatre',
+  'humour': 'spectacles-theatre',
+  'danse': 'spectacles-theatre',
+  'festival': 'festivals',
+  'guinguette': 'ginguettes-guinguettes',
+  'bal': 'ginguettes-guinguettes',
+  'bar': 'bars-soirees',
+  'soiree': 'bars-soirees',
+};
+
+const PULL_ROUGE_MAP: Record<string, Category> = {
+  'concert': 'concerts-musique',
+  'musique': 'concerts-musique',
+  'vernissage': 'expositions-arts',
+  'exposition': 'expositions-arts',
+  'expo': 'expositions-arts',
+};
+
+const BIG_CITY_LABEL_MAP: Record<string, Category> = {
+  'sexpo': 'sexpo',
+  'concert': 'concerts-musique',
+  'musique': 'concerts-musique',
+  'exposition': 'expositions-arts',
+  'expo': 'expositions-arts',
+  'expos': 'expositions-arts',
+  'musees': 'expositions-arts',
+  'spectacle': 'spectacles-theatre',
+  'theatre': 'spectacles-theatre',
+  'stand up': 'spectacles-theatre',
+  'festival': 'festivals',
+  'guinguette': 'ginguettes-guinguettes',
+  'nightlife': 'bars-soirees',
+  'bar': 'bars-soirees',
+  'soiree': 'bars-soirees',
+};
+
 const WIK_URL_PATH_MAP: Record<string, Category> = {
   'sexpo': 'sexpo',
   'scene': 'concerts-musique',
@@ -81,6 +128,36 @@ export function mapWikCategory(urlPath: string): Category | null {
   const normalized = normalizeString(urlPath);
   for (const [key, cat] of Object.entries(WIK_URL_PATH_MAP)) {
     if (normalized.includes(normalizeString(key))) return cat;
+  }
+  return null;
+}
+
+export function mapGrabugeCategory(categories: string[]): Category | null {
+  for (const cat of categories) {
+    const tokens = normalizeString(cat).split(/\s+/).filter(Boolean);
+    for (const [key, mapped] of Object.entries(GRABUGE_CATEGORY_MAP)) {
+      if (tokens.includes(normalizeString(key))) return mapped;
+    }
+  }
+  return null;
+}
+
+export function mapPullRougeCategory(rawText: string): Category | null {
+  const tokens = normalizeString(rawText).split(/\s+/).filter(Boolean);
+  for (const [key, cat] of Object.entries(PULL_ROUGE_MAP)) {
+    const keyTokens = normalizeString(key).split(/\s+/);
+    if (keyTokens.every((t) => tokens.includes(t))) return cat;
+  }
+  return null;
+}
+
+export function mapBigCityCategory(labels: string[]): Category | null {
+  for (const label of labels) {
+    const tokens = normalizeString(label).split(/\s+/).filter(Boolean);
+    for (const [key, cat] of Object.entries(BIG_CITY_LABEL_MAP)) {
+      const keyTokens = normalizeString(key).split(/\s+/);
+      if (keyTokens.every((t) => tokens.includes(t))) return cat;
+    }
   }
   return null;
 }

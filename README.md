@@ -151,11 +151,18 @@ Le job tourne chaque nuit à 3h et persiste les événements de la semaine en co
 | [Nantes Métropole API](https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records) | API JSON (OpenDataSoft) | Nantes + métropole |
 | [Pays de la Loire API](https://data.paysdelaloire.fr/api/explore/v2.1/catalog/datasets/agenda-culture-de-la-region-des-pays-de-la-loire/records) | API JSON (OpenAgenda) | Loire-Atlantique — dataset actuellement peu alimenté pour 2026 |
 | [WIK Nantes](https://www.wik-nantes.fr/agenda) | Scraping HTML (Cheerio) | Nantes |
+| [Grabuge Mag](https://www.grabugemag.com) | API WordPress REST (`/wp-json/tribe/events/v1/events`) | Nantes + Pays de la Loire |
+| [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping AJAX (endpoint `cec_get_events`) | Nantes + environs |
 
 ### Sources prévues (v2)
 
 | Source | Type | Notes |
 |---|---|---|
-| [Grabuge Mag](https://www.grabugemag.com) | API WordPress REST (`/wp-json/tribe/events/v1/events`) | Filtrable par date et catégorie, ~430 événements, JSON structuré avec lieu + coordonnées |
-| [Pull Rouge](https://pullrouge.fr) | Scraping HTML statique | Page unique, pas de robots.txt, dates et lieux en texte brut à parser par regex |
-| [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping HTML | Site rendu côté client (JS) — nécessite Playwright ou Puppeteer, non justifié en v1 |
+| [Pull Rouge](https://pullrouge.fr) | Scraping HTML statique (Cheerio) | Agenda bénévole art indie — concerts & vernissages à Nantes et en Loire-Atlantique |
+
+### Sources prévues (v3)
+
+| Source | Type | Notes |
+|---|---|---|
+| [Dice.fm](https://dice.fm/browse/nantes-5ecd1a2873f34c16102db9fb) | Scraping JS (Next.js `__NEXT_DATA__`) | Billetterie concerts, bonne couverture des salles nantaises |
+| [Shotgun](https://shotgun.live/fr/cities/nantes) | Scraping headless (Playwright) | Billetterie soirées et électro, rendu client-side |
