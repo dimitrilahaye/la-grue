@@ -66,6 +66,32 @@ function parseDateTime(date: string, time?: string): Date {
 
 const MAX_PAGES = 20;
 
+async function fetchMetaDescription(url: string): Promise<string | null> {
+  try {
+    const res = await axios.get<string>(url, {
+      headers: { 'User-Agent': USER_AGENT },
+      timeout: 10000,
+    });
+    const match = res.data.match(/<meta name="description" content="([^"]+)"/i);
+    return match ? match[1].replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#039;/g, "'").trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function enrichDescriptions(events: NormalizedEvent[]): Promise<void> {
+  const BATCH = 5;
+  for (let i = 0; i < events.length; i += BATCH) {
+    const batch = events.slice(i, i + BATCH);
+    await Promise.allSettled(
+      batch.map(async (e) => {
+        if (!e.detailUrl) return;
+        e.description = await fetchMetaDescription(e.detailUrl);
+      }),
+    );
+  }
+}
+
 export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
   console.log('[BigCity] Fetching nonce from listing page...');
   const nonce = await extractNonce();
@@ -144,6 +170,8 @@ export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
     console.warn(`[BigCity] Reached MAX_PAGES (${MAX_PAGES}), stopping pagination`);
   }
 
+  console.log(`[BigCity] Enriching descriptions for ${events.length} events...`);
+  await enrichDescriptions(events);
   console.log(`[BigCity] Total: ${events.length} events`);
   return events;
 }

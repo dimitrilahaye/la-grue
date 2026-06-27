@@ -98,6 +98,26 @@ describe('scrapeBigCity', () => {
     expect(mockedAxios.post).toHaveBeenCalledTimes(2);
   });
 
+  it('enriches description from meta tag on permalink page', async () => {
+    const detailHtml = `<html><head><meta name="description" content="Une expo sur les sorcières." /></head></html>`;
+    mockedAxios.get = jest.fn()
+      .mockResolvedValueOnce({ data: LISTING_HTML })  // nonce extraction
+      .mockResolvedValueOnce({ data: detailHtml });   // enrichment GET
+
+    const events = await scrapeBigCity();
+    expect(events[0].description).toBe('Une expo sur les sorcières.');
+  });
+
+  it('keeps description null when permalink is inaccessible', async () => {
+    mockedAxios.get = jest.fn()
+      .mockResolvedValueOnce({ data: LISTING_HTML })
+      .mockRejectedValueOnce(new Error('timeout'));
+
+    const events = await scrapeBigCity();
+    expect(events[0].description).toBeNull();
+    expect(events).toHaveLength(1);
+  });
+
   it('skips events with unknown category', async () => {
     mockedAxios.post = jest.fn().mockResolvedValue({
       data: {
