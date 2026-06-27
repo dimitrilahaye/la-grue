@@ -3,7 +3,7 @@ import { scrapeWik } from './scrapers/wik';
 import { scrapeGrabuge } from './scrapers/grabuge';
 import { scrapePullRouge } from './scrapers/pullRouge';
 import { scrapeBigCity } from './scrapers/bigCity';
-import { upsertEvents } from './deduplicator';
+import { upsertEvents, purgeExpiredEvents } from './deduplicator';
 
 export interface JobSummary {
   source: string;
@@ -16,6 +16,9 @@ export interface JobSummary {
 export async function runJob(): Promise<JobSummary[]> {
   console.log('[Job] Starting scraping run...');
   const startTime = Date.now();
+
+  const purged = await purgeExpiredEvents();
+  console.log(`[Job] Purged ${purged} expired events (start_at < today)`);
 
   const results = await Promise.allSettled([
     scrapeNantesMetropole().then((events) => ({ source: 'nantes_metropole', events })),

@@ -3,6 +3,13 @@ import { db } from '../db/client';
 import { events } from '../db/schema';
 import { type NormalizedEvent } from '../types/event';
 
+export async function purgeExpiredEvents(): Promise<number> {
+  const result = await db.execute(
+    sql`DELETE FROM events WHERE (start_at AT TIME ZONE 'Europe/Paris')::date < CURRENT_DATE AT TIME ZONE 'Europe/Paris'`
+  );
+  return Array.isArray(result) ? result.length : 0;
+}
+
 export interface UpsertResult {
   inserted: number;
   updated: number;
