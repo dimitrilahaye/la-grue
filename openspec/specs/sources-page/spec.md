@@ -20,12 +20,19 @@ Le système SHALL exposer `/sources.html` listant les sources actives et les sou
 
 #### Scenario: Sources actives affichées
 - **WHEN** l'utilisateur ouvre `/sources.html`
-- **THEN** les sources actives (Nantes Métropole API, Pays de la Loire API, Wik Nantes) sont listées avec leur description et lien
-
-#### Scenario: Sources prévues affichées
-- **WHEN** l'utilisateur ouvre `/sources.html`
-- **THEN** une section "Bientôt" liste Grabuge Mag, Pull Rouge et Big City Nantes avec descriptions issues de leurs propres sites
+- **THEN** les 5 sources actives (Nantes Métropole API, WIK Nantes, Grabuge Mag, Big City Nantes, Pull Rouge) sont listées avec leur description et lien
 
 #### Scenario: Retour à l'accueil
 - **WHEN** l'utilisateur clique "← Retour aux sorties"
 - **THEN** il est redirigé vers la page principale `/`
+
+---
+
+### Requirement: Section sources v3
+
+La page Sources SHALL afficher une section "Bientôt — v3" listant Dice.fm et Shotgun.live comme sources prévues pour une version ultérieure nécessitant un rendu headless.
+
+#### Scenario: Sources v3 visibles
+
+- **WHEN** l'utilisateur consulte la page Sources
+- **THEN** Dice.fm et Shotgun.live apparaissent dans la section "Bientôt — v3"

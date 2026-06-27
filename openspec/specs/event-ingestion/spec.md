@@ -97,6 +97,56 @@ Le système SHALL persister les événements via `INSERT ... ON CONFLICT (source
 
 ---
 
+### Requirement: Purge des événements expirés
+Le système SHALL supprimer en début de chaque run les événements dont `start_at` (converti en heure Europe/Paris) est strictement antérieur à la date du jour (Europe/Paris). Cela garantit que la base ne conserve que des événements présents ou futurs. La purge SHALL être exécutée avant le lancement des scrapers et son résultat SHALL être loggé.
+
+#### Scenario: Purge en début de run
+- **WHEN** le job démarre
+- **THEN** tous les événements dont `(start_at AT TIME ZONE 'Europe/Paris')::date < CURRENT_DATE AT TIME ZONE 'Europe/Paris'` sont supprimés avant le lancement des scrapers
+
+#### Scenario: Log du nombre d'événements purgés
+- **WHEN** la purge s'exécute
+- **THEN** le nombre de lignes supprimées est loggé : `[Job] Purged N expired events (start_at < today)`
+
+#### Scenario: Aucun événement à purger
+- **WHEN** aucune ligne ne correspond au critère de purge
+- **THEN** la purge s'exécute sans erreur et logue 0
+
+---
+
+### Requirement: Ingestion Grabuge Mag
+
+Le système SHALL intégrer la source Grabuge Mag dans le job de scraping nightly. Le scraper Grabuge SHALL être exécuté en parallèle avec les autres sources via `Promise.allSettled`. La `source` associée est `'grabuge'`.
+
+#### Scenario: Source Grabuge dans le job
+
+- **WHEN** le job démarre
+- **THEN** `scrapeGrabuge()` est appelé en parallèle avec les autres scrapers
+
+---
+
+### Requirement: Ingestion Pull Rouge
+
+Le système SHALL intégrer la source Pull Rouge dans le job de scraping nightly. Le scraper Pull Rouge SHALL être exécuté en parallèle avec les autres sources via `Promise.allSettled`. La `source` associée est `'pull_rouge'`.
+
+#### Scenario: Source Pull Rouge dans le job
+
+- **WHEN** le job démarre
+- **THEN** `scrapePullRouge()` est appelé en parallèle avec les autres scrapers
+
+---
+
+### Requirement: Ingestion Big City Nantes
+
+Le système SHALL intégrer la source Big City Nantes dans le job de scraping nightly. Le scraper Big City SHALL être exécuté en parallèle avec les autres sources via `Promise.allSettled`. La `source` associée est `'big_city'`.
+
+#### Scenario: Source Big City dans le job
+
+- **WHEN** le job démarre
+- **THEN** `scrapeBigCity()` est appelé en parallèle avec les autres scrapers
+
+---
+
 ### Requirement: Logging du résultat du job
 Le système SHALL logger à la fin de chaque run : nombre d'événements traités par source, nombre d'insertions, nombre de mises à jour, nombre d'erreurs.
 
