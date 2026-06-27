@@ -12,7 +12,8 @@ job: ## Lance Docker + déclenche le job de scraping en local
 	docker compose -f docker/docker-compose.yml up -d --force-recreate
 	npm run job:run
 
-quality: ## Lint + tests unitaires + build
+quality: ## Lint + tests unitaires + tests de contrat + build
 	npm run lint
 	npm run test:unit
+	npm run test:contract -- --verbose
 	npm run build

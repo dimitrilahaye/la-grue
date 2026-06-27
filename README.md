@@ -56,7 +56,7 @@ L'application est disponible sur [http://localhost:3000](http://localhost:3000).
 |---|---|
 | `make api` | Lance Docker (force-recreate) + démarre le serveur en mode watch |
 | `make job` | Lance Docker (force-recreate) + déclenche le job de scraping |
-| `make quality` | Lint + tests unitaires + build (fail-fast) |
+| `make quality` | Lint + tests unitaires + tests de contrat + build (fail-fast) |
 | `make help` | Liste toutes les commandes disponibles |
 
 ## Scripts disponibles
@@ -70,6 +70,8 @@ L'application est disponible sur [http://localhost:3000](http://localhost:3000).
 | `npm run db:generate` | Génère une migration depuis le schéma |
 | `npm run db:seed` | Insère des données fictives (TRUNCATE + INSERT) |
 | `npm test` | Lance les tests Jest |
+| `npm run test:unit` | Lance les tests unitaires uniquement (utilisé en CI) |
+| `npm run test:contract` | Lance les tests de contrat live (réseau requis, hors CI) |
 | `npm run test:watch` | Tests en mode watch |
 | `npm run job:run` | Déclenche le job de scraping en local |
 

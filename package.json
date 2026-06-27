@@ -14,6 +14,7 @@
     "assets:generate": "tsx scripts/generate-icons.ts",
     "test": "jest",
     "test:unit": "jest --config jest.unit.config.js",
+    "test:contract": "jest --config jest.contract.config.js",
     "test:watch": "jest --watch",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
@@ -33,7 +34,8 @@
     "flatpickr": "^4.6.13",
     "helmet": "^8.2.0",
     "p-limit": "^3.1.0",
-    "postgres": "^3.4.9"
+    "postgres": "^3.4.9",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
