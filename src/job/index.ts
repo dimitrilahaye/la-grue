@@ -1,5 +1,4 @@
 import { scrapeNantesMetropole } from './scrapers/nantesMetropole';
-import { scrapePaysLoire } from './scrapers/paysLoire';
 import { scrapeWik } from './scrapers/wik';
 import { scrapeGrabuge } from './scrapers/grabuge';
 import { scrapePullRouge } from './scrapers/pullRouge';
@@ -20,7 +19,6 @@ export async function runJob(): Promise<JobSummary[]> {
 
   const results = await Promise.allSettled([
     scrapeNantesMetropole().then((events) => ({ source: 'nantes_metropole', events })),
-    scrapePaysLoire().then((events) => ({ source: 'pays_de_loire', events })),
     scrapeWik().then((events) => ({ source: 'wik', events })),
     scrapeGrabuge().then((events) => ({ source: 'grabuge', events })),
     scrapePullRouge().then((events) => ({ source: 'pull_rouge', events })),

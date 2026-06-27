@@ -55,10 +55,12 @@ function cityFromVenue(venue: string): string {
 }
 
 export async function scrapePullRouge(): Promise<NormalizedEvent[]> {
+  console.log('[PullRouge] Fetching listing page...');
   const res = await axios.get<string>(URL, {
     headers: { 'User-Agent': USER_AGENT },
     timeout: 20000,
   });
+  console.log(`[PullRouge] Page loaded (${res.data.length} bytes), parsing blocks...`);
 
   const $ = cheerio.load(res.data);
   const today = new Date();

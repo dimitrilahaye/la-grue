@@ -53,6 +53,7 @@ function parseGrabugeDate(dateStr: string): Date {
 
 export async function scrapeGrabuge(): Promise<NormalizedEvent[]> {
   const { dateStart, dateEnd } = buildDateRange();
+  console.log(`[Grabuge] Starting scrape (${dateStart} → ${dateEnd})`);
   const events: NormalizedEvent[] = [];
   let page = 1;
 
@@ -64,10 +65,20 @@ export async function scrapeGrabuge(): Promise<NormalizedEvent[]> {
       page: String(page),
     });
 
-    const res = await axios.get<GrabugeResponse>(`${API_URL}?${params}`, {
-      headers: { 'User-Agent': USER_AGENT },
-      timeout: 15000,
-    });
+    console.log(`[Grabuge] Fetching page ${page}...`);
+    let res;
+    try {
+      res = await axios.get<GrabugeResponse>(`${API_URL}?${params}`, {
+        headers: { 'User-Agent': USER_AGENT },
+        timeout: 15000,
+      });
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        console.log(`[Grabuge] Page ${page} returned 404 — end of results`);
+        break;
+      }
+      throw err;
+    }
 
     const { events: batch, total_found } = res.data;
     if (!batch || batch.length === 0) break;

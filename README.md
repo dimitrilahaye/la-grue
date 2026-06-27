@@ -149,7 +149,6 @@ Le job tourne chaque nuit à 3h et persiste les événements de la semaine en co
 | Source | Type | Couverture |
 |---|---|---|
 | [Nantes Métropole API](https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records) | API JSON (OpenDataSoft) | Nantes + métropole |
-| [Pays de la Loire API](https://data.paysdelaloire.fr/api/explore/v2.1/catalog/datasets/agenda-culture-de-la-region-des-pays-de-la-loire/records) | API JSON (OpenAgenda) | Loire-Atlantique — dataset actuellement peu alimenté pour 2026 |
 | [WIK Nantes](https://www.wik-nantes.fr/agenda) | Scraping HTML (Cheerio) | Nantes |
 | [Grabuge Mag](https://www.grabugemag.com) | API WordPress REST (`/wp-json/tribe/events/v1/events`) | Nantes + Pays de la Loire |
 | [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping AJAX (endpoint `cec_get_events`) | Nantes + environs |

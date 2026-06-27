@@ -52,7 +52,7 @@ async function extractNonce(): Promise<string> {
     headers: { 'User-Agent': USER_AGENT },
     timeout: 20000,
   });
-  const match = res.data.match(/"nonce"\s*:\s*"([a-f0-9]+)"/);
+  const match = res.data.match(/cec_frontend\s*=\s*\{[^}]*"nonce"\s*:\s*"([a-f0-9]+)"/);
   if (!match) throw new Error('[BigCity] Could not extract nonce from listing page');
   return match[1];
 }
@@ -64,13 +64,19 @@ function parseDateTime(date: string, time?: string): Date {
   return new Date(`${date}T${time}:00`);
 }
 
+const MAX_PAGES = 20;
+
 export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
+  console.log('[BigCity] Fetching nonce from listing page...');
   const nonce = await extractNonce();
+  console.log('[BigCity] Nonce extracted, starting AJAX pagination');
+
   const { dateStart, dateEnd } = buildDateRange();
   const events: NormalizedEvent[] = [];
   let page = 1;
 
-  while (true) {
+  while (page <= MAX_PAGES) {
+    console.log(`[BigCity] Fetching page ${page} (${dateStart} → ${dateEnd})...`);
     const body = new URLSearchParams({
       action: 'cec_get_events',
       nonce,
@@ -92,6 +98,7 @@ export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
     }
 
     const batch = res.data.data?.events ?? [];
+    console.log(`[BigCity] Page ${page}: ${batch.length} events, has_more=${res.data.data?.has_more}`);
     if (batch.length === 0) break;
 
     for (const e of batch) {
@@ -131,6 +138,10 @@ export async function scrapeBigCity(): Promise<NormalizedEvent[]> {
 
     if (!res.data.data?.has_more) break;
     page++;
+  }
+
+  if (page > MAX_PAGES) {
+    console.warn(`[BigCity] Reached MAX_PAGES (${MAX_PAGES}), stopping pagination`);
   }
 
   console.log(`[BigCity] Total: ${events.length} events`);
