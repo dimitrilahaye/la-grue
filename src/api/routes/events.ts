@@ -70,9 +70,12 @@ router.get('/stats', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/categories/counts', async (_req: Request, res: Response) => {
+router.get('/categories/counts', async (req: Request, res: Response) => {
   try {
-    const counts = await getCategoryCounts();
+    const { city } = req.query;
+    const counts = await getCategoryCounts({
+      city: typeof city === 'string' ? city : undefined,
+    });
     res.json(counts);
   } catch (err) {
     console.error('[GET /api/categories/counts] Error:', err);

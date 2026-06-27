@@ -101,12 +101,14 @@ export async function findEventDates(filters: { category?: string; city?: string
   return result.map((row) => (row as { event_date: string }).event_date);
 }
 
-export async function getCategoryCounts(): Promise<Record<string, number>> {
+export async function getCategoryCounts(filters: { city?: string } = {}): Promise<Record<string, number>> {
   const today = new Date().toLocaleDateString('sv', { timeZone: 'Europe/Paris' });
+  const cityFilter = filters.city ? sql`AND lower(city) = lower(${filters.city})` : sql``;
   const result = await db.execute(
     sql`SELECT category, COUNT(*) AS total
         FROM events
         WHERE (start_at AT TIME ZONE 'Europe/Paris')::date >= ${today}::date
+        ${cityFilter}
         GROUP BY category`
   );
   return Object.fromEntries(
