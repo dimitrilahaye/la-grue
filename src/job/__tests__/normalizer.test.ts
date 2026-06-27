@@ -5,6 +5,7 @@ import {
   mapGrabugeCategory,
   mapPullRougeCategory,
   mapBigCityCategory,
+  toCanonicalId,
 } from '../normalizer';
 
 describe('mapNantesMetropoleCategory', () => {
@@ -100,5 +101,56 @@ describe('mapWikCategory', () => {
   });
   it('maps sexpo to sexpo', () => {
     expect(mapWikCategory('sexpo')).toBe('sexpo');
+  });
+});
+
+describe('toCanonicalId', () => {
+  const date = new Date('2026-06-27T20:00:00Z');
+
+  it('produces the same hash for the same inputs', () => {
+    expect(toCanonicalId('Concert de Jazz', date, 'Nantes')).toBe(
+      toCanonicalId('Concert de Jazz', date, 'Nantes'),
+    );
+  });
+
+  it('is case-insensitive', () => {
+    expect(toCanonicalId('Concert de Jazz', date, 'Nantes')).toBe(
+      toCanonicalId('CONCERT DE JAZZ', date, 'Nantes'),
+    );
+  });
+
+  it('strips accents', () => {
+    expect(toCanonicalId('Fête de la Musique', date, 'Nantes')).toBe(
+      toCanonicalId('Fete de la Musique', date, 'Nantes'),
+    );
+  });
+
+  it('ignores punctuation differences', () => {
+    expect(toCanonicalId('En Chantier !', date, 'Nantes')).toBe(
+      toCanonicalId('En Chantier', date, 'Nantes'),
+    );
+  });
+
+  it('produces different hashes for different titles', () => {
+    expect(toCanonicalId('Concert A', date, 'Nantes')).not.toBe(
+      toCanonicalId('Concert B', date, 'Nantes'),
+    );
+  });
+
+  it('produces different hashes for different dates', () => {
+    const other = new Date('2026-06-28T20:00:00Z');
+    expect(toCanonicalId('Concert de Jazz', date, 'Nantes')).not.toBe(
+      toCanonicalId('Concert de Jazz', other, 'Nantes'),
+    );
+  });
+
+  it('defaults city to nantes when null', () => {
+    expect(toCanonicalId('Concert de Jazz', date, null)).toBe(
+      toCanonicalId('Concert de Jazz', date, 'Nantes'),
+    );
+  });
+
+  it('returns a 64-char hex string (sha256)', () => {
+    expect(toCanonicalId('Concert de Jazz', date, 'Nantes')).toMatch(/^[a-f0-9]{64}$/);
   });
 });

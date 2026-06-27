@@ -1,4 +1,5 @@
-import { upsertEvents } from '../deduplicator';
+import { upsertEvents, richnessScore } from '../deduplicator';
+import { events } from '../../db/schema';
 import { db } from '../../db/client';
 import { type NormalizedEvent } from '../../types/event';
 
@@ -14,6 +15,7 @@ function makeEvent(overrides: Partial<NormalizedEvent> = {}): NormalizedEvent {
   return {
     source: 'wik',
     externalId: 'ext-001',
+    canonicalId: 'canonical-001',
     title: 'Test Event',
     description: null,
     startAt: new Date('2026-06-25T20:00:00Z'),
@@ -45,6 +47,32 @@ function setupInsertMock(
 }
 
 // --- Tests ---------------------------------------------------------------
+
+describe('richnessScore', () => {
+  it('returns 0 for an event with no enriched fields', () => {
+    expect(richnessScore(makeEvent({ title: '', description: null, lat: null, lon: null, imageUrl: null, priceInfo: null }))).toBe(0);
+  });
+
+  it('returns 5 for a fully enriched event', () => {
+    expect(richnessScore(makeEvent({
+      title: 'Concert',
+      description: 'Une description',
+      lat: 47.2,
+      lon: -1.5,
+      imageUrl: 'https://img.jpg',
+      priceInfo: '10€',
+    }))).toBe(5);
+  });
+
+  it('counts lat+lon as a single point (both required)', () => {
+    expect(richnessScore(makeEvent({ lat: 47.2, lon: null }))).toBe(1); // title only
+    expect(richnessScore(makeEvent({ lat: 47.2, lon: -1.5 }))).toBe(2); // title + coords
+  });
+
+  it('counts description presence regardless of length', () => {
+    expect(richnessScore(makeEvent({ description: 'x' }))).toBe(2); // title + description
+  });
+});
 
 describe('upsertEvents', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -78,18 +106,32 @@ describe('upsertEvents', () => {
     expect(result.errors).toBe(0);
   });
 
-  it('deduplicates input: keeps last occurrence for same (source, externalId)', async () => {
+  it('deduplicates by canonicalId: keeps the candidate with the highest richness score', async () => {
     const now = new Date();
     const { values } = setupInsertMock([{ id: 'uuid-1', createdAt: now, updatedAt: now }]);
 
-    const first = makeEvent({ externalId: 'id-dup', title: 'First Version' });
-    const second = makeEvent({ externalId: 'id-dup', title: 'Second Version' });
+    const poor = makeEvent({ canonicalId: 'same-canon', externalId: 'ext-a', source: 'wik', title: 'Event', description: null });
+    const rich = makeEvent({ canonicalId: 'same-canon', externalId: 'ext-b', source: 'grabuge', title: 'Event', description: 'Une description complète' });
+
+    await upsertEvents([poor, rich]);
+
+    const rows: Array<{ externalId: string }> = values.mock.calls[0][0];
+    expect(rows).toHaveLength(1);
+    expect(rows[0].externalId).toBe('ext-b');
+  });
+
+  it('deduplicates by canonicalId: when scores are equal, keeps the first', async () => {
+    const now = new Date();
+    const { values } = setupInsertMock([{ id: 'uuid-1', createdAt: now, updatedAt: now }]);
+
+    const first = makeEvent({ canonicalId: 'same-canon', externalId: 'ext-a', title: 'Event' });
+    const second = makeEvent({ canonicalId: 'same-canon', externalId: 'ext-b', title: 'Event' });
 
     await upsertEvents([first, second]);
 
-    const rows: Array<{ title: string }> = values.mock.calls[0][0];
+    const rows: Array<{ externalId: string }> = values.mock.calls[0][0];
     expect(rows).toHaveLength(1);
-    expect(rows[0].title).toBe('Second Version');
+    expect(rows[0].externalId).toBe('ext-a');
   });
 
   it('handles multiple events correctly', async () => {
@@ -120,12 +162,42 @@ describe('upsertEvents', () => {
     });
 
     const result = await upsertEvents([
-      makeEvent({ externalId: 'a' }),
-      makeEvent({ externalId: 'b' }),
+      makeEvent({ externalId: 'a', canonicalId: 'canon-a' }),
+      makeEvent({ externalId: 'b', canonicalId: 'canon-b' }),
     ]);
 
     expect(result.errors).toBe(2);
     expect(result.inserted).toBe(0);
     expect(result.updated).toBe(0);
+  });
+
+  it('uses canonicalId as conflict target', async () => {
+    const now = new Date();
+    const { onConflictDoUpdate } = setupInsertMock([{ id: 'uuid-1', createdAt: now, updatedAt: now }]);
+
+    await upsertEvents([makeEvent()]);
+
+    const callArg = onConflictDoUpdate.mock.calls[0][0];
+    expect(callArg.target).toEqual([events.canonicalId]);
+  });
+
+  it('cross-run: description SQL prefers the longer value', async () => {
+    const now = new Date();
+    const { onConflictDoUpdate } = setupInsertMock([{ id: 'uuid-1', createdAt: now, updatedAt: now }]);
+
+    await upsertEvents([makeEvent({ description: 'courte' })]);
+
+    const set = onConflictDoUpdate.mock.calls[0][0].set;
+    expect(JSON.stringify(set.description)).toMatch(/length/i);
+  });
+
+  it('cross-run: imageUrl SQL uses COALESCE to preserve existing', async () => {
+    const now = new Date();
+    const { onConflictDoUpdate } = setupInsertMock([{ id: 'uuid-1', createdAt: now, updatedAt: now }]);
+
+    await upsertEvents([makeEvent({ imageUrl: null })]);
+
+    const set = onConflictDoUpdate.mock.calls[0][0].set;
+    expect(JSON.stringify(set.imageUrl)).toMatch(/COALESCE/i);
   });
 });
