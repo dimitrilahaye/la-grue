@@ -21,8 +21,8 @@ interface NantesRecord {
   code_postal?: string;
   latitude?: number;
   longitude?: number;
-  themes_libelles?: string;
-  types_libelles?: string;
+  themes_libelles?: string | string[];
+  types_libelles?: string | string[];
   lien_agenda?: string;
   url_site?: string;
   media_url?: string;
@@ -31,6 +31,10 @@ interface NantesRecord {
 }
 
 const AGENDA_BASE = 'https://metropole.nantes.fr/que-faire-a-nantes/agenda';
+
+function toStr(v: string | string[] | undefined): string {
+  return Array.isArray(v) ? v.join(' ') : (v ?? '');
+}
 
 export function toNantesSlug(title: string): string {
   return title
@@ -83,8 +87,10 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
       const startAt = parseDateTime(r.date, r.heure_debut);
       const endAt = r.heure_fin ? parseDateTime(r.date, r.heure_fin) : null;
 
-      const rawCategory = [r.types_libelles, r.themes_libelles].filter(Boolean).join(' ');
-      const category = mapNantesMetropoleCategory(r.types_libelles ?? '', r.themes_libelles ?? '');
+      const typesStr = toStr(r.types_libelles);
+      const themesStr = toStr(r.themes_libelles);
+      const rawCategory = [typesStr, themesStr].filter(Boolean).join(' ');
+      const category = mapNantesMetropoleCategory(typesStr, themesStr);
       if (!category) continue;
 
       events.push({
@@ -102,7 +108,7 @@ export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
         category,
         rawCategory: rawCategory || null,
         tags: [],
-        detailUrl: `${AGENDA_BASE}/${toNantesSlug(r.nom)}`,
+        detailUrl: r.lien_agenda ?? `${AGENDA_BASE}/${toNantesSlug(r.nom)}`,
         imageUrl: r.media_url ?? null,
         isFree: r.gratuit ?? null,
         priceInfo: r.precisions_tarifs_evt ?? null,

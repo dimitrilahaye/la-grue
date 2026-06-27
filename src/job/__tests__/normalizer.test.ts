@@ -17,6 +17,9 @@ describe('mapNantesMetropoleCategory', () => {
   it('returns null for unknown types', () => {
     expect(mapNantesMetropoleCategory('', '')).toBeNull();
   });
+  it('does not match concertation as concert (word-boundary)', () => {
+    expect(mapNantesMetropoleCategory('Conférence - Débat', 'Citoyenneté - Concertation')).toBeNull();
+  });
   it('maps sexpo category', () => {
     expect(mapNantesMetropoleCategory('Sexpo', '')).toBe('sexpo');
   });

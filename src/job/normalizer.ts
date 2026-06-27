@@ -57,10 +57,10 @@ function normalizeString(s: string): string {
 
 export function mapNantesMetropoleCategory(rawTypes: string, rawThemes: string): Category | null {
   const combined = `${rawTypes} ${rawThemes}`.toLowerCase();
-  const normalized = normalizeString(combined);
+  const tokens = normalizeString(combined).split(/\s+/).filter(Boolean);
 
   for (const [key, cat] of Object.entries(NANTES_METROPOLE_MAP)) {
-    if (normalized.includes(normalizeString(key))) return cat;
+    if (tokens.includes(normalizeString(key))) return cat;
   }
   return null;
 }

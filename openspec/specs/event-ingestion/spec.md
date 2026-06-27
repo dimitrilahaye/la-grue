@@ -7,11 +7,19 @@ Agrégation nocturne des événements nantais depuis plusieurs sources hétérog
 ## Requirements
 
 ### Requirement: Ingestion Nantes Métropole API
-Le système SHALL interroger l'API OpenDataSoft Nantes Métropole (`https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records`) pour récupérer les événements de la semaine en cours et de la semaine suivante. Les champs `id_manif`, `nom`, `date`, `heure_debut`, `heure_fin`, `lieu`, `adresse`, `ville`, `themes_libelles`, `types_libelles`, `media_url`, `gratuit` et `precisions_tarifs_evt` SHALL être mappés vers le schéma unifié Event. Le `detailUrl` SHALL être généré depuis le champ `nom` via une fonction de slug (`toNantesSlug`) : lowercase → NFD → suppression diacritiques → suppression non-alphanumériques (hors espace et tiret) → trim → remplacement espaces/tirets par tiret unique, préfixé par `https://metropole.nantes.fr/que-faire-a-nantes/agenda/`. Le champ `lien_agenda` (URL `infonantes` dépréciée) n'est plus utilisé pour le `detailUrl`.
+Le système SHALL interroger l'API OpenDataSoft Nantes Métropole (`https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records`) pour récupérer les événements de la semaine en cours et de la semaine suivante. Les champs `id_manif`, `nom`, `date`, `heure_debut`, `heure_fin`, `lieu`, `adresse`, `ville`, `themes_libelles`, `types_libelles`, `media_url`, `gratuit` et `precisions_tarifs_evt` SHALL être mappés vers le schéma unifié Event. Le `detailUrl` SHALL être lu depuis le champ `lien_agenda` de l'API, qui contient l'URL directe et fiable vers la fiche événement (`https://metropole.nantes.fr/infonantes/agenda/{id_manif}`). En l'absence de ce champ, un slug généré depuis `nom` SHALL être utilisé en fallback.
 
 #### Scenario: Récupération réussie
 - **WHEN** le job appelle l'API Nantes Métropole avec un filtre de date sur les 14 prochains jours
 - **THEN** les événements retournés sont normalisés et persistés en base via UPSERT
+
+#### Scenario: detailUrl depuis lien_agenda
+- **WHEN** un record NM contient un champ `lien_agenda` non null
+- **THEN** le `detailUrl` de l'événement normalisé est la valeur de `lien_agenda`
+
+#### Scenario: detailUrl fallback slug
+- **WHEN** un record NM a un `lien_agenda` absent ou null
+- **THEN** le `detailUrl` est construit par slugification du `nom` préfixé par l'URL de base NM
 
 #### Scenario: API indisponible
 - **WHEN** l'API retourne une erreur HTTP (5xx) ou un timeout
@@ -60,7 +68,7 @@ Le système SHALL scraper `https://www.wik-nantes.fr/agenda?date=DD/MM/YYYY` (da
 ---
 
 ### Requirement: Normalisation vers le schéma unifié
-Le système SHALL transformer les données de chaque source vers un objet `NormalizedEvent` commun avant persistence. La catégorie normalisée SHALL être l'une des valeurs : `bars-soirees`, `concerts-musique`, `expositions-arts`, `spectacles-theatre`, `festivals`, `ginguettes-guinguettes`, `sexpo`. Les fonctions de mapping (`mapNantesMetropoleCategory`, `mapPaysLoireCategory`, `mapWikCategory`) SHALL retourner `Category | null` — jamais `'autres'`. Les scrapers SHALL ignorer tout événement dont le mapping retourne `null` : aucun événement sans catégorie reconnue n'est persisté.
+Le système SHALL transformer les données de chaque source vers un objet `NormalizedEvent` commun avant persistence. La catégorie normalisée SHALL être l'une des valeurs : `bars-soirees`, `concerts-musique`, `expositions-arts`, `spectacles-theatre`, `festivals`, `ginguettes-guinguettes`, `sexpo`. Les fonctions de mapping (`mapNantesMetropoleCategory`, `mapPaysLoireCategory`, `mapWikCategory`) SHALL retourner `Category | null` — jamais `'autres'`. Les scrapers SHALL ignorer tout événement dont le mapping retourne `null` : aucun événement sans catégorie reconnue n'est persisté. La correspondance entre libellés bruts et catégories SHALL se faire par **correspondance de token entier** (word-token matching) : un mot-clé ne matche que s'il apparaît comme token isolé dans le string normalisé, afin d'éviter les faux positifs par sous-chaîne (ex: `"concertation"` ne doit pas matcher le mot-clé `"concert"`). Les champs `types_libelles` et `themes_libelles` de l'API NM étant de type `string | string[]`, le scraper SHALL normaliser ces valeurs en `string` (join des éléments du tableau) avant de les passer au normalizer.
 
 #### Scenario: Catégorie mappée
 - **WHEN** la catégorie brute source correspond à une règle de mapping connue
@@ -69,6 +77,10 @@ Le système SHALL transformer les données de chaque source vers un objet `Norma
 #### Scenario: Catégorie inconnue
 - **WHEN** la catégorie brute ne correspond à aucune règle de mapping
 - **THEN** le mapping retourne `null` et l'événement est ignoré (non inséré en base)
+
+#### Scenario: Faux positif sous-chaîne évité
+- **WHEN** le libellé d'un événement contient `"Concertation"` (processus de concertation citoyenne)
+- **THEN** le mapping retourne `null` et l'événement est ignoré, car `"concertation"` n'est pas le token `"concert"`
 
 ---
 
