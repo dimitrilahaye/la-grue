@@ -38,6 +38,19 @@ describe('scrapeGrabuge', () => {
     expect(events[0].title).toBe('Festival Fumetti 2026');
   });
 
+  it('strips HTML from description', async () => {
+    const events = await scrapeGrabuge();
+    expect(events[0].description).toBe('Un festival de BD.');
+  });
+
+  it('sets description to null when absent', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValueOnce({
+      data: { events: [{ ...mockEvent, description: undefined }], total_found: 1 },
+    }).mockResolvedValueOnce({ data: { events: [], total_found: 1 } });
+    const events = await scrapeGrabuge();
+    expect(events[0].description).toBeNull();
+  });
+
   it('sets externalId from event id', async () => {
     const events = await scrapeGrabuge();
     expect(events[0].externalId).toBe('10019244');

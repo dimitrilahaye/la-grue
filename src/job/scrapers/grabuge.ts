@@ -1,6 +1,11 @@
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 import { type NormalizedEvent } from '../../types/event';
 import { mapGrabugeCategory } from '../normalizer';
+
+function stripHtml(html: string): string {
+  return cheerio.load(html).text().replace(/\s+/g, ' ').trim();
+}
 
 const API_URL = 'https://www.grabugemag.com/wp-json/tribe/events/v1/events';
 const USER_AGENT = 'LaGrue-Bot/1.0 (https://github.com/dimitrilahaye/la-grue)';
@@ -100,7 +105,7 @@ export async function scrapeGrabuge(): Promise<NormalizedEvent[]> {
         source: 'grabuge',
         externalId: String(e.id),
         title: e.title,
-        description: e.description ?? null,
+        description: e.description ? stripHtml(e.description) : null,
         startAt,
         endAt,
         venueName: e.venue?.venue ?? null,
