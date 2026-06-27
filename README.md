@@ -153,12 +153,7 @@ Le job tourne chaque nuit à 3h et persiste les événements de la semaine en co
 | [WIK Nantes](https://www.wik-nantes.fr/agenda) | Scraping HTML (Cheerio) | Nantes |
 | [Grabuge Mag](https://www.grabugemag.com) | API WordPress REST (`/wp-json/tribe/events/v1/events`) | Nantes + Pays de la Loire |
 | [Big City Nantes](https://www.bigcitynantes.fr/que-faire-a-nantes/) | Scraping AJAX (endpoint `cec_get_events`) | Nantes + environs |
-
-### Sources prévues (v2)
-
-| Source | Type | Notes |
-|---|---|---|
-| [Pull Rouge](https://pullrouge.fr) | Scraping HTML statique (Cheerio) | Agenda bénévole art indie — concerts & vernissages à Nantes et en Loire-Atlantique |
+| [Pull Rouge](https://pullrouge.fr) | Scraping HTML statique (Cheerio) | Nantes + Loire-Atlantique — agenda bénévole art indie, concerts & vernissages |
 
 ### Sources prévues (v3)
 
