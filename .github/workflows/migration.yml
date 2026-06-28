@@ -2,11 +2,16 @@ name: Migration
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [Integration]
+    branches: [main]
+    types: [completed]
 
 jobs:
   migrate:
     name: Run DB migrations
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     steps:
       - uses: actions/checkout@v4
 

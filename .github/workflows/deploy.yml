@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: [Integration]
+    workflows: [Migration]
     branches: [main]
     types: [completed]
 
