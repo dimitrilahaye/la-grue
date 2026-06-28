@@ -22,6 +22,18 @@ jobs:
 
       - run: npm ci
 
+      - name: Test DB connection
+        run: |
+          node -e "
+          const postgres = require('postgres');
+          const sql = postgres(process.env.MIGRATION_DATABASE_URL, { ssl: { rejectUnauthorized: false } });
+          sql\`SELECT 1 AS ok\`
+            .then(() => { console.log('DB connection OK'); return sql.end(); })
+            .catch(e => { console.error('DB connection FAILED:', e.message); process.exit(1); });
+          "
+        env:
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+
       - name: Run Drizzle migrations
         run: npm run db:migrate
         env:

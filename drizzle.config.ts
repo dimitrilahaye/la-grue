@@ -12,7 +12,7 @@ export default defineConfig({
   dialect: 'postgresql',
   dbCredentials: {
     url: migrationUrl,
-    ssl: true,
+    ssl: { rejectUnauthorized: false },
   },
   verbose: true,
   strict: true,
