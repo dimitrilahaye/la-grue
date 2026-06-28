@@ -606,3 +606,7 @@ a { color: var(--color-accent-dark); }
   .form-actions .btn { flex: 1; }
   .detail-body { padding: var(--space-md) var(--space-md) var(--space-xl); }
 }
+
+@media (hover: none) {
+  .day-date-input, .field-input { font-size: 1rem; }
+}
