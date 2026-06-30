@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Temporal } from 'temporal-polyfill';
+import { DateTime } from 'luxon';
 import { type NormalizedEvent } from '../../types/event';
 import { mapNantesMetropoleCategory, toCanonicalId } from '../normalizer';
 
@@ -57,9 +57,8 @@ function buildDateRange(): { dateStart: string; dateEnd: string } {
 }
 
 function parseDateTime(dateStr: string, timeStr?: string): Date {
-  const plain = Temporal.PlainDateTime.from(`${dateStr}T${timeStr ?? '00:00'}:00`);
-  const zdt = plain.toZonedDateTime('Europe/Paris');
-  return new Date(zdt.epochMilliseconds);
+  const dt = DateTime.fromISO(`${dateStr}T${timeStr ?? '00:00'}`, { zone: 'Europe/Paris' });
+  return dt.toJSDate();
 }
 
 export async function scrapeNantesMetropole(): Promise<NormalizedEvent[]> {
