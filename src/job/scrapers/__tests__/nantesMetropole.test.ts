@@ -85,6 +85,22 @@ describe('scrapeNantesMetropole', () => {
     const events = await scrapeNantesMetropole();
     expect(events).toHaveLength(0);
   });
+
+  it('interprets heure_debut as Europe/Paris — summer UTC+2 (20:00 Paris = 18:00 UTC)', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValue({
+      data: { results: [{ ...mockRecord, date: '2026-07-01', heure_debut: '20:00', heure_fin: undefined }], total_count: 1 },
+    });
+    const events = await scrapeNantesMetropole();
+    expect(events[0].startAt.toISOString()).toBe('2026-07-01T18:00:00.000Z');
+  });
+
+  it('interprets heure_debut as Europe/Paris — winter UTC+1 (20:00 Paris = 19:00 UTC)', async () => {
+    mockedAxios.get = jest.fn().mockResolvedValue({
+      data: { results: [{ ...mockRecord, date: '2026-01-15', heure_debut: '20:00', heure_fin: undefined }], total_count: 1 },
+    });
+    const events = await scrapeNantesMetropole();
+    expect(events[0].startAt.toISOString()).toBe('2026-01-15T19:00:00.000Z');
+  });
 });
 
 describe('toNantesSlug', () => {
